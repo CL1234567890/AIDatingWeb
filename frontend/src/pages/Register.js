@@ -1,13 +1,14 @@
 // src/pages/Register.js
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
-const Register = () => {
+const Register = ({ onAuthSuccess }) => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [age, setAge] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
+  const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -19,6 +20,12 @@ const Register = () => {
 
     // TODO: Backend API
     console.log("Register:", { name, email, age, password });
+
+    // demo: assume register success -> logged in
+    if (onAuthSuccess) {
+      onAuthSuccess();
+    }
+    navigate("/dates");
   };
 
   return (
@@ -112,7 +119,7 @@ const Register = () => {
 
         <p className="secondary-text">
           Already have an account?{" "}
-          <Link to="/">Log in</Link>
+          <Link to="/login">Log in</Link>
         </p>
       </form>
     </div>

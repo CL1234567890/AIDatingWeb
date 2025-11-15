@@ -1,191 +1,128 @@
 # System Patterns
 
-## Architecture Overview
-AIDatingWeb follows a **client-server architecture** with a clear separation between frontend and backend:
+## System Architecture
 
+### Overall Structure
 ```
-┌─────────────────────┐
-│   React Frontend    │
-│   (Port 3000)       │
-└──────────┬──────────┘
-           │
-           │ HTTP/REST API
-           │
-┌──────────▼──────────┐
-│   Python Backend    │
-│   (TBD Port)        │
-└──────────┬──────────┘
-           │
-    ┌──────┴──────┐
-    │             │
-┌───▼───┐   ┌────▼─────┐
-│  DB   │   │ External │
-│ (TBD) │   │   APIs   │
-└───────┘   └──────────┘
-              - Google Maps
-              - AI Services
+Frontend (React) <-> Backend (Python) <-> External APIs
+                                        - Google Maps API
+                                        - AI Services (TBD)
 ```
 
-## Frontend Architecture
+**Architecture Style**: Client-Server with RESTful API
+- Frontend: Single Page Application (SPA) with React
+- Backend: Python API server
+- Communication: HTTP/HTTPS with JSON payloads
 
-### Component Structure
+### Key Components
+
+#### Frontend (React)
 ```
 src/
-├── components/        # Reusable UI components
-│   └── Navbar.js     # Navigation component
-├── pages/            # Route-level page components
-│   ├── Login.js      # Login page with form
-│   └── Register.js   # Registration page with form
-├── App.js            # Main app with routing
-└── index.js          # React entry point
+├── components/     # Reusable UI components
+│   └── Navbar.js   # Navigation component
+├── pages/          # Route-level page components
+│   ├── Login.js    # Login page
+│   └── Register.js # Registration page
+├── App.js          # Main application component
+└── index.js        # Application entry point
 ```
 
-### Routing Pattern
-- Uses **React Router DOM v7** for client-side routing
-- Route definitions centralized in App.js
-- Page components are lazy-loaded candidates for future optimization
+#### Backend (Python)
+- Location: To be determined
+- Expected structure: API routes, authentication, database models, AI integrations
 
-### State Management
-- **Current**: Local component state with `useState`
-- **Future**: Will need global state management (Context API or Redux) for:
-  - User authentication state
-  - User profile data
-  - Match data
-  - Real-time messaging state
+### Component Relationships
 
-### API Integration Pattern
-- Frontend will call backend REST APIs
-- TODO: Implement API service layer (e.g., `src/services/api.js`)
-- TODO: Add authentication token management (JWT or session)
-- TODO: Add error handling and loading states
+1. **Authentication Flow**
+   - Login/Register pages → Backend auth endpoints → JWT/Session token → Protected routes
+   
+2. **User Profile Flow**
+   - Profile page → Backend user API → Database → Response with user data
+   
+3. **Matching Flow**
+   - Match page → Backend matching algorithm → AI analysis → Database query → Match suggestions
+   
+4. **Messaging Flow**
+   - Conversation page → Backend messaging API → Database → Optional AI assistance → Message delivery
+   
+5. **Date Planning Flow**
+   - Date planner → Backend AI service → Google Maps API → Personalized route generation → Display on map
 
-## Backend Architecture (To Be Implemented)
+## Key Technical Decisions
 
-### Expected Structure
-```
-backend/
-├── app/
-│   ├── routes/          # API endpoints
-│   ├── models/          # Database models
-│   ├── services/        # Business logic
-│   │   ├── auth.py      # Authentication service
-│   │   ├── matching.py  # AI matching algorithm
-│   │   ├── maps.py      # Google Maps integration
-│   │   └── ai.py        # AI services (icebreaker, interpreter)
-│   └── utils/           # Helper functions
-├── config/              # Configuration
-└── main.py              # Application entry point
-```
+### Frontend Decisions
+1. **React**: Standard SPA framework, good for rapid development
+2. **Component-based Architecture**: Reusable components for consistency
+3. **React Router**: For page navigation (inferred from pages/ structure)
+4. **State Management**: TBD (could be Context API, Redux, or simple useState)
 
-### Backend Framework
-- **Expected**: Flask or FastAPI
-- RESTful API design
-- JWT-based authentication (planned)
+### Backend Decisions
+1. **Python**: Chosen for AI/ML integration capabilities
+2. **Framework**: TBD (likely Flask or FastAPI for rapid development)
+3. **Authentication**: JWT or session-based (decision pending)
+4. **Database**: TBD (likely PostgreSQL, MongoDB, or SQLite for hackathon speed)
 
-## Key Design Patterns
+### API Integration Decisions
+1. **Google Maps API**: For location services and route planning
+2. **AI Service**: TBD (OpenAI, Anthropic, or other for icebreakers/message interpretation)
 
-### 1. Component Composition (Frontend)
-- Reusable UI components (Navbar, forms, buttons)
-- Page components compose smaller components
-- Consistent styling through CSS classes
+## Design Patterns in Use
 
-### 2. Form Handling Pattern
-Current implementation in Login/Register:
-```javascript
-const [field, setField] = useState("");
+### Frontend Patterns
+1. **Component Composition**: Building complex UIs from simple, reusable components
+2. **Container/Presenter Pattern**: Separation of logic (containers) from presentation (components)
+3. **Route-based Code Splitting**: Pages organized by routes
 
-const handleSubmit = (e) => {
-  e.preventDefault();
-  // Validation
-  // API call (TODO)
-};
-```
-
-### 3. Authentication Flow (Planned)
-```
-Login/Register → Backend Auth → JWT Token → 
-Store in localStorage/cookie → Include in API headers
-```
-
-### 4. API Service Layer (To Be Implemented)
-Centralized API calls:
-```javascript
-// services/api.js
-export const login = (email, password) => {...}
-export const register = (userData) => {...}
-export const getMatches = () => {...}
-```
+### Backend Patterns (Anticipated)
+1. **MVC/MVT Pattern**: Model-View-Controller for organizing code
+2. **Repository Pattern**: Database access abstraction
+3. **Middleware Pattern**: For authentication, logging, error handling
+4. **Service Layer**: Business logic separation from API routes
 
 ## Critical Implementation Paths
 
-### 1. Authentication Flow
+### Path 1: Authentication (Foundation)
 ```
-User Input → Frontend Validation → Backend API → 
-Database Check → Token Generation → Frontend Storage → 
-Protected Routes Access
+User Input → Validation → Backend API → Database → Token Generation → Client Storage → Protected Routes
 ```
 
-### 2. Matching System
+### Path 2: Matching Algorithm
 ```
-User Profile Data → AI Matching Algorithm → 
-Compatibility Scoring → Location Filtering → 
-Return Curated Matches
+User Profile → Matching Criteria → AI Analysis → Database Query → Score Calculation → Match Results
 ```
 
-### 3. Date Map Feature
+### Path 3: AI-Powered Date Planning (Differentiator)
 ```
-User Input (Current Vibe/Preferences) → Backend Service → 
-Google Maps API → Location Search → AI Filtering → 
-Route Optimization → Return Personalized Itinerary
+User Input (vibe/preferences) → Backend AI Service → Vibe Analysis → Google Maps API Query → Location Filtering → Route Optimization → Personalized Itinerary
 ```
 
-### 4. Real-time Messaging
+### Path 4: Real-time Messaging
 ```
-WebSocket Connection → Message Send → 
-Backend Relay → Recipient Connection → 
-Message Delivery → Read Receipts
+Message Send → Backend API → Database Storage → Message Delivery → Optional AI Processing → Recipient Display
 ```
 
-## Component Relationships
+## Architecture Principles
 
-### Current Structure
-- **App.js** → Controls routing, contains Navbar and page rendering
-- **Navbar** → Persistent navigation across all pages
-- **Login/Register** → Independent page components, link to each other
-- All components share global CSS (App.css, index.css)
+1. **Separation of Concerns**: Frontend focuses on UI/UX, backend handles business logic and data
+2. **API-First Design**: Well-defined API contracts between frontend and backend
+3. **Scalable Structure**: Organized for potential growth beyond hackathon
+4. **Security-Focused**: Proper authentication, input validation, secure API communication
+5. **Hackathon-Optimized**: Pragmatic decisions favoring speed without sacrificing core functionality
 
-### Future Dependencies
-- Protected routes will need authentication context
-- Profile pages will consume user data from API
-- Match pages will need real-time updates
-- Chat interface will require WebSocket connection
+## Integration Points
 
-## Data Flow Patterns
+1. **Frontend ↔ Backend**: REST API with JSON
+2. **Backend ↔ Database**: ORM or direct queries
+3. **Backend ↔ Google Maps API**: HTTP requests for location data
+4. **Backend ↔ AI Services**: API calls for intelligent features
+5. **Frontend ↔ Google Maps**: Embedded maps for visualization
 
-### Current (Frontend Only)
-```
-User Input → Local State → Console Log (placeholder)
-```
+## Current Implementation Status
 
-### Target (Full Stack)
-```
-User Input → Local State → API Service → 
-Backend Logic → Database → Response → 
-State Update → UI Re-render
-```
-
-## Security Considerations
-- Password validation on both frontend and backend
-- HTTPS for all API communications
-- JWT token expiration and refresh
-- Input sanitization to prevent injection attacks
-- Rate limiting on authentication endpoints
-- OAuth implementation for trusted third-party auth
-
-## Scalability Patterns
-- Stateless backend services for horizontal scaling
-- Database connection pooling
-- Caching layer for frequently accessed data (matches, profiles)
-- CDN for static assets
-- WebSocket server separation for messaging
-- API versioning for backward compatibility
+- Frontend structure initialized with React
+- Basic pages created (Login, Register)
+- Navigation component in place
+- Backend structure pending
+- API integration pending
+- Database schema pending

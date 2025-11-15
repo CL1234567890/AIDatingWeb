@@ -1,4 +1,4 @@
-Building a React frontend, python backend dating app.
+Building a React frontend, python backend dating app for a hackathon (12 hours).
 
 
 Essential Features

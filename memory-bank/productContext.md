@@ -1,58 +1,48 @@
 # Product Context
 
-## Vision
-AIDatingWeb is an AI-powered dating platform that revolutionizes the dating experience by combining intelligent matchmaking with personalized date planning. Unlike traditional dating apps that simply connect people, this platform creates meaningful experiences by understanding user emotions, preferences, and context.
+## Why This Project Exists
 
-## Problems Solved
+AI-powered dating app built for a 12-hour hackathon. The app aims to enhance the dating experience by combining traditional dating app features with intelligent AI assistance for better matches, conversations, and date planning.
 
-### 1. Match Quality
-Traditional dating apps rely on superficial swipe mechanics. AIDatingWeb uses AI to curate matches based on deeper compatibility factors including interests, location, and user preferences.
+## Problems It Solves
 
-### 2. Date Planning Friction
-After matching, users often struggle with "what to do" and "where to go". The Date Map feature eliminates this friction by automatically generating personalized date locations and routes based on the user's current vibe and preferences.
+1. **Match Quality**: Uses AI to improve match recommendations beyond simple profile matching
+2. **Conversation Anxiety**: Provides icebreaker generation and message interpretation to help users communicate better
+3. **Date Planning Complexity**: Eliminates the stress of planning dates by automatically generating personalized locations and routes based on user's current vibe and preferences
+4. **Generic Date Suggestions**: Instead of showing random places, intelligently selects destinations matching emotional tone and energy level
 
-### 3. Conversation Barriers
-Starting and maintaining conversations can be challenging. The platform provides:
-- **Icebreaker Generator**: AI-powered conversation starters tailored to match profiles
-- **Message Interpreter**: Helps users understand context and tone in messages
+## How It Should Work
 
-### 4. Emotional Context
-The system understands not just who you are, but how you're feeling today, matching date locations to your emotional tone and energy level rather than showing random places.
+### User Journey
+1. **Onboarding**: User registers/logs in with email+password (OAuth optional)
+2. **Profile Creation**: User sets up profile with name, age, gender, interests, location
+3. **Matching**: System finds and presents potential matches
+4. **Conversation**: Users can chat with matches, with optional AI assistance (icebreakers, message interpretation)
+5. **Date Planning**: System uses Google Maps API to generate personalized date locations and smart route planning based on user's vibe/preferences
 
-## User Experience Goals
+### Key User Experience Goals
+- **Fast Setup**: Quick registration and profile creation suitable for hackathon demo
+- **Intelligent Assistance**: AI features should feel helpful, not intrusive
+- **Personalized Experience**: Date recommendations and matches should feel tailored to individual preferences
+- **Intuitive Interface**: Clean, modern UI that's easy to navigate
+- **Mobile-First**: Design should work well on mobile devices
 
-### Seamless Onboarding
-- Simple email/password registration
-- Optional OAuth for convenience
-- Minimal required information (name, age, email, password)
-- Progressive profile building
+## Feature Priority
 
-### Intelligent Matching
-- AI-curated matches based on comprehensive compatibility
-- Location-aware matching
-- Interest and preference alignment
+### Essential (Must Have)
+1. User authentication (login/registration)
+2. User profiles
+3. Match system
+4. Conversation/messaging
+5. Date Map with Smart Route Planning
 
-### Effortless Date Planning
-- One-click date route generation via Google Maps API
-- Vibe-based location selection
-- Personalized to current mood and energy level
-- Smart route optimization
+### Secondary (Nice to Have)
+1. OAuth integration
+2. AI Icebreaker generator
+3. AI Message interpreter
 
-### Engaging Communication
-- AI-assisted conversation starters
-- Message interpretation for better understanding
-- Low-pressure interaction flow
-
-## Target Users
-- Singles 18+ seeking meaningful connections
-- People tired of traditional swipe-based dating
-- Users who value AI-assisted decision making
-- Individuals who struggle with date planning or conversation starters
-- Those seeking emotionally intelligent dating experiences
-
-## Success Metrics
-- User engagement with AI-generated date suggestions
-- Quality of matches (measured by conversation depth and duration)
-- Date conversion rate (matches → actual dates)
-- User retention and satisfaction
-- Usage of AI features (icebreakers, message interpretation)
+## Success Criteria
+- Functional demo within 12-hour timeframe
+- Core features working end-to-end
+- Impressive AI-powered date planning feature as differentiator
+- Clean, presentable UI for hackathon judges

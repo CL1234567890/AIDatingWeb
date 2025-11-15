@@ -1,30 +1,35 @@
 // src/components/Navbar.js
 import React from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 
-const Navbar = () => {
-  const { pathname } = useLocation();
-
+const Navbar = ({ isAuth }) => {
   return (
-    <nav className="navbar">
+    <header className="navbar">
       <div className="navbar-logo">AIDATING</div>
+
       <div className="navbar-right">
-        <Link
-          to="/"
-          className={`nav-btn nav-ghost ${pathname === "/" ? "nav-active" : ""}`}
-        >
-          Log in
-        </Link>
-        <Link
-          to="/register"
-          className={`nav-btn nav-solid ${
-            pathname === "/register" ? "nav-active" : ""
-          }`}
-        >
-          Sign up
-        </Link>
+        {isAuth ? (
+          <>
+            <Link to="/dates" className="nav-btn nav-ghost">
+              Plan a date
+            </Link>
+            <Link to="/matches" className="nav-btn nav-ghost">
+              Matches
+            </Link>
+            {/* 以后可以加 logout 按钮，这里先空着 */}
+          </>
+        ) : (
+          <>
+            <Link to="/login" className="nav-btn nav-ghost">
+              Log in
+            </Link>
+            <Link to="/register" className="nav-btn nav-solid">
+              Sign up
+            </Link>
+          </>
+        )}
       </div>
-    </nav>
+    </header>
   );
 };
 

@@ -1,14 +1,23 @@
+// src/pages/Login.js
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
-const Login = () => {
+const Login = ({ onLoginSuccess }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // TODO: 调后端登录 API
+    // TODO: Backend API
     console.log("Login:", { email, password });
+
+    // 临时：认为登录成功
+    if (onLoginSuccess) {
+      onLoginSuccess();
+    }
+    // 跳转到欢迎页
+    navigate("/dashboard");
   };
 
   return (

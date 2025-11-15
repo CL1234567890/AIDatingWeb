@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Dating App - System Design</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+        
+        h1 {
+            color: #667eea;
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            font-size: 1.2em;
+            margin-bottom: 40px;
+        }
+        
+        h2 {
+            color: #764ba2;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+            margin-top: 50px;
+        }
+        
+        .diagram-section {
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .description {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #fff;
+            border-radius: 5px;
+        }
+        
+        .mermaid {
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        
+        .tech-stack {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .tech-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .tech-card h3 {
+            margin-top: 0;
+            border-bottom: 2px solid rgba(255,255,255,0.3);
+            padding-bottom: 10px;
+        }
+        
+        .tech-card ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .tech-card li {
+            padding: 5px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+        
+        .tech-card li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+        
+        .note {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        
+        .note strong {
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 AI Dating App - System Design</h1>
+        <div class="subtitle">Hackathon Project - 12 Hour Build</div>
+        
+        <div class="note">
+            <strong>👥 Team Structure:</strong> Frontend team handles React UI, Backend developer (you) handles Python API and integrations
+        </div>
+
+        <!-- Tech Stack Overview -->
+        <h2>🛠️ Technology Stack</h2>
+        <div class="tech-stack">
+            <div class="tech-card">
+                <h3>Frontend (Team)</h3>
+                <ul>
+                    <li>React 19.2.0</li>
+                    <li>React Router DOM 7.9.6</li>
+                    <li>Create React App</li>
+                    <li>Modern UI/UX</li>
+                </ul>
+            </div>
+            <div class="tech-card">
+                <h3>Backend (You)</h3>
+                <ul>
+                    <li>FastAPI (Recommended)</li>
+                    <li>SQLite Database</li>
+                    <li>SQLAlchemy ORM</li>
+                    <li>JWT Authentication</li>
+                </ul>
+            </div>
+            <div class="tech-card">
+                <h3>External APIs</h3>
+                <ul>
+                    <li>Google Maps API</li>
+                    <li>OpenAI API</li>
+                    <li>Places API</li>
+                    <li>Routes API</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- System Architecture -->
+        <h2>🏗️ System Architecture</h2>
+        <div class="diagram-section">
+            <div class="description">
+                <strong>High-Level Architecture:</strong> Client-server architecture with React SPA frontend, Python REST API backend, and external AI services for intelligent features.
+            </div>
+            <div class="mermaid">
+graph TB
+    subgraph "Client Layer"
+        A[React Frontend<br/>Port 3000]
+    end
+    
+    subgraph "Backend Layer"
+        B[FastAPI Server<br/>Port 8000]
+        C[Authentication<br/>JWT]
+        D[Business Logic]
+        E[Database<br/>SQLite]
+    end
+    
+    subgraph "External Services"
+        F[Google Maps API<br/>Places & Routes]
+        G[OpenAI API<br/>AI Features]
+    end
+    
+    A -->|HTTP/JSON| B
+    B --> C
+    B --> D
+    D --> E
+    D -->|API Calls| F
+    D -->|API Calls| G
+    
+    style A fill:#61dafb
+    style B fill:#009688
+    style E fill:#ffa726
+    style F fill:#4285f4
+    style G fill:#10a37f
+            </div>
+        </div>
+
+        <!-- Database Schema -->
+        <h2>💾 Database Schema</h2>
+        <div class="diagram-section">
+            <div class="description">
+                <strong>Entity Relationships:</strong> Core entities for user management, matching, and messaging. Simple schema optimized for hackathon speed.
+            </div>
+            <div class="mermaid">
+erDiagram
+    USER ||--o{ MATCH : creates
+    USER ||--o{ MESSAGE : sends
+    USER ||--o{ PROFILE : has
+    USER ||--o{ DATE_PLAN : requests
+    MATCH }o--|| USER : targets
+    MESSAGE }o--|| CONVERSATION : belongs_to
+    CONVERSATION }o--|| USER : participant1
+    CONVERSATION }o--|| USER : participant2
+    
+    USER {
+        int id PK
+        string email UK
+        string password_hash
+        datetime created_at
+        boolean is_active
+    }
+    
+    PROFILE {
+        int id PK
+        int user_id FK
+        string name
+        int age
+        string gender
+        string location
+        json interests
+        string bio
+    }
+    
+    MATCH {
+        int id PK
+        int user_id FK
+        int target_user_id FK
+        string status
+        datetime created_at
+    }
+    
+    CONVERSATION {
+        int id PK
+        int user1_id FK
+        int user2_id FK
+        datetime created_at
+        datetime last_message_at
+    }
+    
+    MESSAGE {
+        int id PK
+        int conversation_id FK
+        int sender_id FK
+        text content
+        datetime sent_at
+        boolean is_read
+    }
+    
+    DATE_PLAN {
+        int id PK
+        int user_id FK
+        string vibe
+        json preferences
+        json locations
+        json route
+        datetime created_at
+    }
+            </div>
+        </div>
+
+        <!-- API Structure -->
+        <h2>🔌 API Endpoints</h2>
+        <div class="diagram-section">
+            <div class="description">
+                <strong>RESTful API Design:</strong> Clean, organized endpoints grouped by functionality. All responses in JSON format.
+            </div>
+            <div class="mermaid">
+graph LR
+    subgraph "Authentication"
+        A1[POST /api/auth/register]
+        A2[POST /api/auth/login]
+        A3[GET /api/auth/me]
+    end
+    
+    subgraph "User Profiles"
+        B1[GET /api/users/profile/:id]
+        B2[PUT /api/users/profile]
+        B3[DELETE /api/users/profile]
+    end
+    
+    subgraph "Matching"
+        C1[GET /api/matches/]
+        C2[POST /api/matches/:id/like]
+        C3[POST /api/matches/:id/pass]
+        C4[GET /api/matches/matched]
+    end
+    
+    subgraph "Messaging"
+        D1[GET /api/messages/conversations]
+        D2[GET /api/messages/:id]
+        D3[POST /api/messages/:id]
+        D4[POST /api/messages/icebreaker]
+    end
+    
+    subgraph "AI Date Planning"
+        E1[POST /api/dates/plan]
+        E2[GET /api/dates/locations]
+    end
+    
+    style A1 fill:#4caf50
+    style A2 fill:#4caf50
+    style B2 fill:#ff9800
+    style C2 fill:#2196f3
+    style D3 fill:#9c27b0
+    style E1 fill:#f44336
+            </div>
+        </div>
+
+        <!-- Authentication Flow -->
+        <h2>🔐 Authentication Flow</h2>
+        <div class="diagram-section">
+            <div class="description">
+                <strong>JWT-Based Authentication:</strong> Stateless authentication using JSON Web Tokens. Secure password hashing with bcrypt.
+            </div>
+            <div class="mermaid">
+sequenceDiagram
+    participant U as User
+    participant F as Frontend
+    participant B as Backend
+    participant DB as Database
+    
+    U->>F: Enter credentials
+    F->>B: POST /api/auth/register or /login
+    B->>B: Validate input
+    
+    alt Registration
+        B->>B: Hash password
+        B->>DB: Save user
+        DB-->>B: User created
+    else Login
+        B->>DB: Query user
+        DB-->>B: User data
+        B->>B: Verify password
+    end
+    
+    B->>B: Generate JWT token
+    B-->>F: Return token + user data
+    F->>F: Store token (localStorage)
+    F-->>U: Login successful
+    
+    Note over F,B: Subsequent requests include JWT in header
+    
+    U->>F: Access protected resource
+    F->>B: GET /api/... (with JWT header)
+    B->>B: Verify JWT token
+    alt Valid token
+        B->>DB: Fetch data
+        DB-->>B: Data
+        B-->>F: Return data
+        F-->>U: Display data
+    else Invalid token
+        B-->>F: 401 Unauthorized
+        F-->>U: Redirect to login
+    end
+            </div>
+        </div>
+
+        <!-- Matching Algorithm -->
+        <h2>💘 Matching Algorithm Flow</h2>
+        <div class="diagram-section">
+            <div class="description">
+                <strong>Intelligent Matching:</strong> Combines user preferences with AI analysis to suggest compatible matches.
+            </div>
+            <div class="mermaid">
+graph TD
+    A[User Requests Matches] --> B[Get User Profile]
+    B --> C[Fetch Potential Matches]
+    C --> D{Apply Filters}
+    D -->|Age Range| E[Filter by Age]
+    D -->|Location| F[Filter by Distance]
+    D -->|Gender Preference| G[Filter by Gender]
+    D -->|Interests| H[Filter by Interests]
+    
+    E --> I[Calculate Compatibility Score]
+    F --> I
+    G --> I
+    H --> I
+    
+    I --> J[Sort by Score]
+    J --> K[Return Top Matches]
+    
+    K --> L{User Action}
+    L -->|Like| M[Create Match Record]
+    L -->|Pass| N[Update History]
+    
+    M --> O{Is Mutual?}
+    O -->|Yes| P[Create Conversation]
+    O -->|No| Q[Wait for Response]
+    
+    style A fill:#e1bee7
+    style I fill:#fff59d
+    style P fill:#a5d6a7
+    style K fill:#90caf9
+            </div>
+        </div>
+
+        <!-- AI Date Planning Flow -->
+        <h2>🗺️ AI-Powered Date Planning (Differentiator)</h2>
+        <div class="diagram-section">
+            <div class="description">
+                <strong>The Wow Factor:</strong> Uses AI to analyze user's vibe and preferences, then generates personalized date locations and smart routes via Google Maps API.
+            </div>
+            <div class="mermaid">
+graph TB
+    A[User Inputs Vibe & Preferences] --> B[Backend Receives Request]
+    B --> C[AI Vibe Analysis]
+    
+    C --> D{Analyze Vibe}
+    D -->|Adventurous| E[Active Locations]
+    D -->|Romantic| F[Intimate Settings]
+    D -->|Casual| G[Relaxed Spots]
+    D -->|Foodie| H[Restaurant Focus]
+    
+    E --> I[Query Google Places API]
+    F --> I
+    G --> I
+    H --> I
+    
+    I --> J[Filter by:<br/>- Location<br/>- Rating<br/>- Price<br/>- Open Hours]
+    
+    J --> K[Score & Rank Locations]
+    K --> L[Select Top 3-5 Places]
+    
+    L --> M[Google Routes API]
+    M --> N[Optimize Travel Route]
+    
+    N --> O[Generate Itinerary]
+    O --> P{Add AI Suggestions}
+    P -->|OpenAI| Q[Generate Tips<br/>& Conversation Starters]
+    
+    Q --> R[Return Complete<br/>Date Plan]
+    R --> S[Display on Map<br/>+ Details]
+    
+    style A fill:#e1f5fe
+    style C fill:#fff9c4
+    style I fill:#4285f4
+    style Q fill:#10a37f
+    style R fill:#c8e6c9
+            </div>
+        </div>
+
+        <!-- Data Flow -->
+        <h2>🔄 Complete User Journey</h2>
+        <div class="diagram-section">
+            <div class="description">
+                <strong>End-to-End Flow:</strong> From registration to getting AI-powered date suggestions.
+            </div>
+            <div class="mermaid">
+graph LR
+    A[Register/Login] --> B[Create Profile]
+    B --> C[View Matches]
+    C --> D{Like or Pass}
+    
+    D -->|Pass| C
+    D -->|Like| E{Match?}
+    
+    E -->|No Match| C
+    E -->|Match!| F[Start Conversation]
+    
+    F --> G[Send Messages]
+    G --> H[Request AI Icebreaker]
+    H --> G
+    
+    G --> I[Plan Date]
+    I --> J[AI Analyzes Vibe]
+    J --> K[Generate Locations]
+    K --> L[Create Route]
+    L --> M[Display Date Plan]
+    M --> N[Go on Date!]
+    
+    style A fill:#4caf50
+    style E fill:#ff9800
+    style F fill:#2196f3
+    style J fill:#9c27b0
+    style N fill:#f44336
+            </div>
+        </div>
+
+        <!-- Deployment Architecture -->
+        <h2>🚀 Deployment Strategy</h2>
+        <div class="diagram-section">
+            <div class="description">
+                <strong>Demo Deployment:</strong> Simple deployment strategy optimized for hackathon demo presentation.
+            </div>
+            <div class="mermaid">
+graph TB
+    subgraph "Development"
+        A[Local Development]
+        A1[Frontend: localhost:3000]
+        A2[Backend: localhost:8000]
+        A3[SQLite File DB]
+    end
+    
+    subgraph "Demo Deployment Options"
+        B1[Option 1: Local Demo]
+        B2[Option 2: Cloud Deploy]
+    end
+    
+    subgraph "Cloud Services"
+        C1[Vercel<br/>Frontend]
+        C2[Railway/Heroku<br/>Backend]
+        C3[SQLite<br/>or PostgreSQL]
+    end
+    
+    A --> B1
+    A --> B2
+    
+    B1 --> D[Run Both Locally]
+    B2 --> C1
+    B2 --> C2
+    C2 --> C3
+    
+    C1 -->|HTTPS| E[Frontend URL]
+    C2 -->|HTTPS| F[API URL]
+    
+    E --> G[Demo Presentation]
+    F --> G
+    D --> G
+    
+    style A fill:#90caf9
+    style B2 fill:#a5d6a7
+    style G fill:#ffab91
+            </div>
+        </div>
+
+        <!-- Implementation Timeline -->
+        <h2>⏱️ Development Timeline (12 Hours)</h2>
+        <div class="diagram-section">
+            <div class="description">
+                <strong>Phased Approach:</strong> Prioritized implementation plan for hackathon constraints.
+            </div>
+            <div class="mermaid">
+gantt
+    title Hackathon Development Timeline
+    dateFormat HH:mm
+    axisFormat %H:%M
+    
+    section Setup
+    Memory Bank & Planning           :done, 00:00, 1h
+    
+    section Backend Foundation
+    Project Structure                :active, 01:00, 30m
+    Virtual Env & Dependencies       :01:30, 15m
+    Basic Server & Health Check      :01:45, 15m
+    
+    section Database
+    Design Schema                    :02:00, 30m
+    Create Models                    :02:30, 45m
+    Test DB Operations              :03:15, 15m
+    
+    section Authentication
+    Password Hashing                 :03:30, 30m
+    JWT Implementation               :04:00, 45m
+    Register/Login Endpoints         :04:45, 45m
+    
+    section Core APIs
+    User Profile Endpoints           :05:30, 1h
+    Match Endpoints                  :06:30, 1h
+    Message Endpoints                :07:30, 1h
+    
+    section Matching Logic
+    Algorithm Implementation         :08:30, 1h
+    
+    section AI Integration
+    Google Maps Setup                :09:30, 45m
+    Date Planning Algorithm          :10:15, 1h15m
+    AI Icebreaker (Optional)        :11:30, 30m
+    
+    section Integration
+    Frontend Testing                 :crit, 12:00, 1h
+    Bug Fixes & Polish              :13:00, 30m
+    Demo Preparation                :13:30, 30m
+            </div>
+        </div>
+
+        <!-- Priority Features -->
+        <h2>🎯 Feature Priority</h2>
+        <div class="diagram-section">
+            <div class="mermaid">
+graph TD
+    A[All Features] --> B{Priority Level}
+    
+    B -->|CRITICAL| C[Must Have]
+    B -->|HIGH| D[Should Have]
+    B -->|MEDIUM| E[Nice to Have]
+    
+    C --> C1[✓ User Auth]
+    C --> C2[✓ User Profiles]
+    C --> C3[✓ Matching System]
+    C --> C4[✓ Messaging]
+    C --> C5[✓ Basic Date Planning]
+    
+    D --> D1[✓ AI Vibe Analysis]
+    D --> D2[✓ Google Maps Routes]
+    D --> D3[✓ Smart Location Selection]
+    
+    E --> E1[? OAuth Login]
+    E --> E2[? Icebreaker Generator]
+    E --> E3[? Message Interpreter]
+    E --> E4[? Real-time Chat]
+    
+    style C fill:#f44336
+    style C1 fill:#4caf50
+    style C2 fill:#4caf50
+    style C3 fill:#4caf50
+    style C4 fill:#4caf50
+    style C5 fill:#4caf50
+    style D fill:#ff9800
+    style E fill:#9e9e9e
+            </div>
+        </div>
+
+        <!-- Notes Section -->
+        <div class="note" style="margin-top: 40px;">
+            <strong>📝 Key Points for Team:</strong>
+            <ul>
+                <li>Backend developer focuses on Python API, authentication, matching logic, and AI integrations</li>
+                <li>Frontend team builds React UI and integrates with API endpoints</li>
+                <li>FastAPI provides automatic API documentation at <code>/docs</code> endpoint</li>
+                <li>CORS must be configured for localhost:3000 during development</li>
+                <li>AI-powered date planning is the differentiator - must work for demo</li>
+                <li>SQLite for quick setup, can migrate to PostgreSQL post-hackathon</li>
+                <li>Timeline is tight - focus on MVP, polish later if time permits</li>
+            </ul>
+        </div>
+
+        <div style="text-align: center; margin-top: 40px; padding: 20px; background: #f8f9fa; border-radius: 10px;">
+            <h3 style="color: #667eea;">🚀 Ready to Build!</h3>
+            <p style="color: #666;">Share this document with your team and let's create something amazing in 12 hours!</p>
+        </div>
+    </div>
+
+    <script>
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'default',
+            themeVariables: {
+                primaryColor: '#667eea',
+                primaryTextColor: '#fff',
+                primaryBorderColor: '#764ba2',
+                lineColor: '#764ba2',
+                secondaryColor: '#a5d6a7',
+                tertiaryColor: '#fff59d'
+            }
+        });
+    </script>
+</body>
+</html>

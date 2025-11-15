@@ -1,39 +1,81 @@
 // src/pages/Register.js
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 
-const Register = ({ onAuthSuccess }) => {
+const Register = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [age, setAge] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const { signup } = useAuth();
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (password !== confirm) {
-      alert("Passwords do not match.");
+      setError("Passwords do not match.");
       return;
     }
 
-    // TODO: Backend API
-    console.log("Register:", { name, email, age, password });
-
-    // demo: assume register success -> logged in
-    if (onAuthSuccess) {
-      onAuthSuccess();
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters long.");
+      return;
     }
-    navigate("/dates");
+
+    try {
+      setError("");
+      setLoading(true);
+      
+      // Create user with profile data
+      await signup(email, password, {
+        name,
+        age: age ? parseInt(age) : null,
+      });
+      
+      navigate("/dashboard");
+    } catch (error) {
+      console.error("Registration error:", error);
+      
+      // Handle specific error codes
+      if (error.code === "auth/email-already-in-use") {
+        setError("An account with this email already exists.");
+      } else if (error.code === "auth/invalid-email") {
+        setError("Invalid email address.");
+      } else if (error.code === "auth/weak-password") {
+        setError("Password is too weak. Use at least 6 characters.");
+      } else {
+        setError("Failed to create account. Please try again.");
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="auth-card">
       <h2>Create your account</h2>
       <p className="subtext">
-        Tell us a bit about you. We’ll let AI find your best matches.
+        Tell us a bit about you. We'll let AI find your best matches.
       </p>
+
+      {error && (
+        <div style={{ 
+          color: '#ef4444', 
+          backgroundColor: '#fee2e2', 
+          padding: '12px', 
+          borderRadius: '8px', 
+          marginBottom: '16px',
+          fontSize: '14px'
+        }}>
+          {error}
+        </div>
+      )}
 
       <form className="auth-form" onSubmit={handleSubmit}>
         {/* Name */}
@@ -113,8 +155,8 @@ const Register = ({ onAuthSuccess }) => {
           />
         </div>
 
-        <button type="submit" className="primary-button">
-          Sign Up
+        <button type="submit" className="primary-button" disabled={loading}>
+          {loading ? "Creating account..." : "Sign Up"}
         </button>
 
         <p className="secondary-text">

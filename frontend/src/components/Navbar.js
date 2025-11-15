@@ -1,8 +1,20 @@
 // src/components/Navbar.js
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 
 const Navbar = ({ isAuth }) => {
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate("/login");
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  };
   return (
     <header className="navbar">
       <div className="navbar-logo">AIDATING</div>
@@ -16,7 +28,9 @@ const Navbar = ({ isAuth }) => {
             <Link to="/matches" className="nav-btn nav-ghost">
               Matches
             </Link>
-            {/* 以后可以加 logout 按钮，这里先空着 */}
+            <button onClick={handleLogout} className="nav-btn nav-ghost" style={{ cursor: 'pointer' }}>
+              Logout
+            </button>
           </>
         ) : (
           <>

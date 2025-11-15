@@ -1,0 +1,213 @@
+/* src/App.css */
+
+/* Theme variables */
+:root {
+  --primary: #ff5c8d;
+  --primary-soft: rgba(255, 92, 141, 0.15);
+  --bg-dark: #020617;
+  --bg-card: rgba(15, 23, 42, 0.96);
+  --text-main: #e5e7eb;
+  --text-muted: #9ca3af;
+  --border-subtle: rgba(148, 163, 184, 0.5);
+}
+
+/* Global */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+    "Segoe UI", sans-serif;
+  background: radial-gradient(circle at top, #1f2937 0, #020617 55%, #000 100%);
+  color: var(--text-main);
+}
+
+/* App layout */
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Navbar */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 32px;
+  backdrop-filter: blur(22px);
+  background: linear-gradient(
+    90deg,
+    rgba(15, 23, 42, 0.9),
+    rgba(15, 23, 42, 0.4),
+    rgba(15, 23, 42, 0.9)
+  );
+  border-bottom: 1px solid rgba(148, 163, 184, 0.35);
+}
+
+.navbar-logo {
+  font-weight: 700;
+  font-size: 1.3rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #f9a8d4;
+}
+
+.navbar-right {
+  display: flex;
+  gap: 10px;
+}
+
+.nav-btn {
+  padding: 6px 14px;
+  font-size: 0.85rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.nav-ghost {
+  background: transparent;
+  color: var(--text-main);
+  border-color: rgba(148, 163, 184, 0.6);
+}
+
+.nav-ghost:hover {
+  background: rgba(15, 23, 42, 0.8);
+}
+
+.nav-solid {
+  background: linear-gradient(135deg, #fb7185, #ec4899);
+  color: #fdf2f8;
+}
+
+.nav-solid:hover {
+  filter: brightness(1.08);
+}
+
+/* Main layout */
+.main-layout {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 32px 16px 40px;
+  gap: 24px;
+}
+
+.column {
+  flex: 1;
+  max-width: 420px;
+}
+
+/* Auth cards */
+.auth-card {
+  background: var(--bg-card);
+  border-radius: 26px;
+  padding: 26px 24px 22px;
+  border: 1px solid var(--border-subtle);
+  box-shadow: 0 24px 70px rgba(15, 23, 42, 0.9);
+  backdrop-filter: blur(26px);
+}
+
+.auth-card h2 {
+  margin: 0 0 6px;
+  font-size: 1.55rem;
+}
+
+.auth-card .subtext {
+  margin: 0 0 18px;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+/* Form */
+.auth-form {
+  margin-top: 4px;
+}
+
+.form-group {
+  margin-bottom: 14px;
+}
+
+.label-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.78rem;
+  margin-bottom: 4px;
+  color: var(--text-muted);
+}
+
+.label-row .label {
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.label-row .helper {
+  font-style: italic;
+}
+
+.input {
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid var(--border-subtle);
+  padding: 9px 11px;
+  background: rgba(15, 23, 42, 0.9);
+  color: var(--text-main);
+  outline: none;
+  font-size: 0.9rem;
+}
+
+.input::placeholder {
+  color: rgba(148, 163, 184, 0.7);
+}
+
+.input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 1px var(--primary-soft);
+}
+
+/* Buttons */
+.primary-button {
+  width: 100%;
+  margin-top: 8px;
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: none;
+  background: linear-gradient(135deg, #fb7185, #ec4899);
+  color: #fdf2f8;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.primary-button:hover {
+  filter: brightness(1.08);
+}
+
+/* Bottom text */
+.secondary-text {
+  margin-top: 14px;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .main-layout {
+    flex-direction: column;
+  }
+
+  .navbar {
+    padding: 10px 18px;
+  }
+
+  .navbar-right {
+    gap: 6px;
+  }
+}

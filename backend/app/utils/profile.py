@@ -4,6 +4,7 @@ import firebase_admin
 from firebase_admin import auth, credentials, firestore
 import os
 from typing import Optional
+import random
 
 
 
@@ -41,4 +42,18 @@ def get_user_profile(user_id):
     else:
         return None
 
+
+def get_all_user_profiles():
+    profile_ref = db.collection('profiles')
+    profiles_stream = profile_ref.stream()
+    
+    profiles_list = []
+
+    for doc in profiles_stream:
+        profile_data = doc.to_dict()
+        profile_data['document_id'] = doc.id 
+        profiles_list.append(profile_data)
+        print(profile_data)
+
+    return profiles_list
 

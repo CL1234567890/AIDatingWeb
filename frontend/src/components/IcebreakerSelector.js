@@ -71,7 +71,7 @@ const IcebreakerSelector = ({ recipientId, onSelect, onSkip }) => {
         marginBottom: 12,
         color: 'var(--text-primary)'
       }}>
-        🎯 Start the conversation! Pick one:
+        Start the conversation! Pick one:
       </div>
 
       {error && (
@@ -139,7 +139,7 @@ const IcebreakerSelector = ({ recipientId, onSelect, onSkip }) => {
             e.currentTarget.style.color = 'var(--text-secondary)';
           }}
         >
-          ✍️ Write your own message
+         Write your own message
         </button>
       </div>
 
@@ -150,7 +150,7 @@ const IcebreakerSelector = ({ recipientId, onSelect, onSkip }) => {
         textAlign: 'center',
         opacity: 0.7
       }}>
-        💡 These messages are AI-generated based on your match's profile
+       These messages are AI-generated based on your match's profile
       </div>
     </div>
   );

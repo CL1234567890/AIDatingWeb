@@ -39,11 +39,13 @@ async def generate_icebreaker(
     user: dict = Depends(get_current_user)
 ):
     """
-    Generate personalized icebreaker message(s) for a match
+    Generate personalized icebreaker message(s) for a date match
     
     This endpoint takes the sender (authenticated user) and recipient user IDs,
     fetches their profiles from Firebase, and uses AI to generate personalized
-    icebreaker messages based on their interests, bios, and common ground.
+    icebreaker messages based on their interests, bios, and common ground. Do
+    not use emojis or special characters in the generated messages. Make it
+    short and remember this is supposed to emulate the feel of a text message.
     
     **Authentication Required**: Yes (JWT token in Authorization header)
     

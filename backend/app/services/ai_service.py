@@ -118,7 +118,7 @@ Generate ONLY the icebreaker message text (no quotes, no preamble, just the mess
             
             # Call OpenAI API
             response = self.client.chat.completions.create(
-                model="gpt-3.5-turbo",  # Fast and cost-effective for hackathon
+                model="gpt-4o-mini",  # Fast and cost-effective for hackathon
                 messages=[
                     {
                         "role": "system",

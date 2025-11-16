@@ -25,3 +25,9 @@ python-multipart==0.0.6
 
 # CORS Support (included in FastAPI but explicit for clarity)
 # fastapi already includes starlette which has CORS middleware
+
+# Machine Learning Libraries (for recommendation algorithm)
+pandas
+scikit-learn
+scipy
+numpy

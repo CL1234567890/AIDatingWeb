@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from datetime import datetime
 
 # Import routes
-from app.routes import ai_date_plan, icebreaker
+from app.routes import ai_date_plan, icebreaker, recommend
 
 # Firebase (already provided by teammate)
 from app.utils.auth import initialize_firebase, get_current_user
@@ -77,10 +77,10 @@ async def test_auth(user: dict = Depends(get_current_user)):
 # Include routers (each router defines its own prefix and tags)
 app.include_router(icebreaker.router)
 app.include_router(ai_date_plan.router)
+app.include_router(recommend.router)
 
 # TODO: Add more routes as they're created
-# from app.routes import matches, chat
-# app.include_router(matches.router)
+# from app.routes import chat
 # app.include_router(chat.router)
 
 if __name__ == "__main__":

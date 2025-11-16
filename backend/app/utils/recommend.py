@@ -1,4 +1,4 @@
-from profile import get_all_user_profiles, get_all_user_profiles_from_csv
+from app.utils.profile import get_all_user_profiles, get_all_user_profiles_from_csv
 
 import pandas as pd
 import numpy as np

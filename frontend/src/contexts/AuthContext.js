@@ -29,24 +29,18 @@ export const AuthProvider = ({ children }) => {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      // Create user profile in Firestore
-      await setDoc(doc(db, 'users', user.uid), {
+      // Create user profile in Firestore with schema for recommendation algorithm
+      await setDoc(doc(db, 'profiles', user.uid), {
         uid: user.uid,
+        name: profileData.name || '',
         email: user.email,
-        profile: {
-          name: profileData.name || '',
-          age: profileData.age || null,
-          gender: profileData.gender || '',
-          interests: profileData.interests || [],
-          location: profileData.location || null,
-          bio: profileData.bio || '',
-          photos: []
-        },
-        preferences: {
-          ageRange: [18, 100],
-          distance: 50,
-          interests: []
-        },
+        age: profileData.age || null,
+        gender: profileData.gender || '',
+        sexual_orientation: profileData.sexual_orientation || '',
+        location: profileData.location || '',
+        income_bracket: profileData.income_bracket || '',
+        education_level: profileData.education_level || '',
+        interest_tags: profileData.interest_tags || '',
         createdAt: new Date().toISOString(),
         lastActive: new Date().toISOString()
       });
@@ -83,7 +77,7 @@ export const AuthProvider = ({ children }) => {
   // Fetch user profile from Firestore
   const fetchUserProfile = async (uid) => {
     try {
-      const userDoc = await getDoc(doc(db, 'users', uid));
+      const userDoc = await getDoc(doc(db, 'profiles', uid));
       if (userDoc.exists()) {
         setUserProfile(userDoc.data());
         return userDoc.data();

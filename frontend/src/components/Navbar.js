@@ -41,7 +41,7 @@ const Navbar = ({ isAuth }) => {
   };
   return (
     <header className="navbar">
-      <div className="navbar-logo">AIDATING</div>
+      <div className="navbar-logo">IntelliLOVE</div>
 
       <div className="navbar-right">
         {isAuth ? (

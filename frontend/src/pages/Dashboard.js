@@ -8,7 +8,7 @@ const Dashboard = () => {
 
   return (
     <div className="auth-card">
-      <h2>Welcome to AIDATING</h2>
+      <h2>Welcome to IntelliLOVE</h2>
       <p className="subtext">
         You're in. Choose what you want to do today — plan a smart date or
         browse your AI-curated matches.

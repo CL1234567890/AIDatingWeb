@@ -35,8 +35,9 @@ class DatePlanRequest(BaseModel):
     mood: str
     budget: str
     indoorOutdoor: str
-    distance: float
+    distance: float  # in miles
     timeOfDay: str
+    zipCode: Optional[str] = None
     latitude: Optional[float] = None
     longitude: Optional[float] = None
 
@@ -144,6 +145,36 @@ def build_summary_with_openai(req: DatePlanRequest, places: List[Place]) -> str:
     return completion.choices[0].message.content.strip()
 
 
+# ========= Google Geocoding Helper =========
+
+def geocode_zipcode(zipcode: str) -> Optional[tuple[float, float]]:
+    """
+    Convert a US zip code to lat/lng using Google Geocoding API.
+    Returns (lat, lng) or None if not found.
+    """
+    url = "https://maps.googleapis.com/maps/api/geocode/json"
+    params = {
+        "key": GOOGLE_MAPS_API_KEY,
+        "address": zipcode,
+        "components": "country:US"
+    }
+    
+    try:
+        resp = requests.get(url, params=params, timeout=10)
+        if resp.status_code != 200:
+            return None
+        
+        data = resp.json()
+        results = data.get("results", [])
+        if not results:
+            return None
+        
+        location = results[0]["geometry"]["location"]
+        return (location["lat"], location["lng"])
+    except Exception:
+        return None
+
+
 # ========= Google Places Helpers =========
 
 def search_place_with_google(
@@ -208,9 +239,31 @@ def build_route_url(places: List[Place]) -> str:
 
 @router.post("/dates/plan", response_model=DatePlanResponse)
 async def plan_date(req: DatePlanRequest):
-    # Default coordinates: Atlanta
-    lat = req.latitude or 33.7490
-    lng = req.longitude or -84.3880
+    # Determine coordinates
+    lat = None
+    lng = None
+    
+    # Priority 1: Use zip code if provided
+    if req.zipCode:
+        coords = geocode_zipcode(req.zipCode)
+        if coords:
+            lat, lng = coords
+        else:
+            raise HTTPException(
+                status_code=400,
+                detail="Invalid zip code. Please enter a valid US zip code."
+            )
+    # Priority 2: Use lat/lng if provided
+    elif req.latitude is not None and req.longitude is not None:
+        lat = req.latitude
+        lng = req.longitude
+    # Priority 3: Default to Atlanta
+    else:
+        lat = 33.7490
+        lng = -84.3880
+    
+    # Convert miles to kilometers for Google API
+    distance_km = req.distance * 1.60934
 
     # Step 1: choose place types via OpenAI
     types = choose_place_types_with_openai(req)
@@ -218,7 +271,7 @@ async def plan_date(req: DatePlanRequest):
     # Step 2: find places with Google
     places: List[Place] = []
     for t in types:
-        p = search_place_with_google(t, lat, lng, req.distance)
+        p = search_place_with_google(t, lat, lng, distance_km)
         if p:
             places.append(p)
 

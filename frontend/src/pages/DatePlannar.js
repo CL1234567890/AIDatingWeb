@@ -8,6 +8,7 @@ const DatePlanner = () => {
   const [indoorOutdoor, setIndoorOutdoor] = useState("either");
   const [distance, setDistance] = useState(5);
   const [timeOfDay, setTimeOfDay] = useState("evening");
+  const [zipCode, setZipCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [plan, setPlan] = useState(null);
   const [error, setError] = useState("");
@@ -24,7 +25,8 @@ const DatePlanner = () => {
         budget, 
         indoorOutdoor, 
         distance, 
-        timeOfDay 
+        timeOfDay,
+        zipCode: zipCode.trim() || undefined
       });
       setPlan(result);
     } catch (err) {
@@ -56,6 +58,22 @@ const DatePlanner = () => {
             placeholder="e.g. I’m tired from work, want something cozy and not too crowded…"
             value={mood}
             onChange={(e) => setMood(e.target.value)}
+          />
+        </div>
+
+        {/* Zip Code */}
+        <div className="form-group">
+          <div className="label-row">
+            <span className="label">Location (Zip Code)</span>
+            <span className="helper">Optional - defaults to Atlanta</span>
+          </div>
+          <input
+            type="text"
+            className="input"
+            placeholder="e.g. 10001"
+            value={zipCode}
+            onChange={(e) => setZipCode(e.target.value)}
+            maxLength={5}
           />
         </div>
 
@@ -94,13 +112,13 @@ const DatePlanner = () => {
         {/* Distance slider */}
         <div className="form-group">
           <div className="label-row">
-            <span className="label">Max distance (km)</span>
-            <span className="helper">{distance} km</span>
+            <span className="label">Max distance (miles)</span>
+            <span className="helper">{distance} miles</span>
           </div>
           <input
             type="range"
             min="1"
-            max="25"
+            max="30"
             value={distance}
             onChange={(e) => setDistance(e.target.value)}
             className="input"

@@ -1,4 +1,4 @@
-from profile import get_all_user_profiles
+from profile import get_all_user_profiles, get_all_user_profiles_from_csv
 
 import pandas as pd
 import numpy as np
@@ -10,182 +10,183 @@ from scipy.sparse import hstack, csr_matrix
 
 
 FEATURE_WEIGHTS = {
-    'numerical': 1.0,  # age, app usage time
-    'categorical': 0.5, # gender, location
-    'text': 2.0         # interest tags
+    'numerical': 3.0,
+    'categorical': 2.0,
+    'text': 2.0
 }
 
 
 class HybridRecommender:
     def __init__(self, df, weights=FEATURE_WEIGHTS):
-        self.df = df
+        self.df = df.reset_index(drop=True)   # ensure clean index
         self.weights = weights
         self.user_ids = df['uid'].tolist()
-        # Initialize TFIDF Vectorizer to process 'interest_tags' text data
-        
+
         self.tfidf_vectorizer = TfidfVectorizer(stop_words='english', max_features=500)
-        # Setup the preprocessor for non-text features
         self.preprocessor = self._setup_preprocessor()
-        self.feature_matrix = None 
+        self.feature_matrix = None
 
     def _setup_preprocessor(self):
-        numerical_features = ['age', 'likes_received', 'mutual_matches', 'app_usage_time_min']
-        categorical_features = ['gender', 'sexual_orientation', 'location', 
-                                'income_bracket', 'education_level', 'app_usage_time_label']
+        numerical_features = ['age']
+        categorical_features = [
+            'gender', 'sexual_orientation', 'location',
+            'income_bracket', 'education_level'
+        ]
 
         return ColumnTransformer(
             transformers=[
                 ('num', StandardScaler(), numerical_features),
                 ('cat', OneHotEncoder(handle_unknown='ignore', sparse_output=True), categorical_features)
             ],
-            remainder='drop', # Drop unused columns (name, email, uid, interest_tags)
+            remainder='drop',
             verbose_feature_names_out=False
-        ).set_output(transform="default")
+        )
 
     def fit(self):
+        print("1. Processing numerical & categorical features...")
         X_other = self.preprocessor.fit_transform(self.df)
-        n_num_features = len(self.preprocessor.named_transformers_['num'].get_feature_names_out())
-        
+
+        # Safe extraction of numerical block
+        n_num_features = self.preprocessor.named_transformers_['num'].transform(
+            self.df[['age']]
+        ).shape[1]
+
         X_num = X_other[:, :n_num_features]
         X_cat = X_other[:, n_num_features:]
-        
+
         print(f"   -> Numerical Features shape: {X_num.shape}")
         print(f"   -> Categorical Features shape: {X_cat.shape}")
 
-
         print("2. Processing text features (interest_tags) with TF-IDF...")
-        # 3. Process Text Feature (TF-IDF)
         X_text = self.tfidf_vectorizer.fit_transform(self.df['interest_tags'].fillna(''))
         print(f"   -> Text Features (TF-IDF) shape: {X_text.shape}")
 
-        print("3. Combining and weighting features...")
-        # 4. Apply weights and combine features using sparse matrices
-        X_num_weighted = X_num * self.weights['numerical']
-        X_cat_weighted = X_cat * self.weights['categorical']
-        X_text_weighted = X_text * self.weights['text']
-        
-        # Horizontally stack all weighted sparse feature matrices
-        self.feature_matrix = hstack([X_num_weighted, X_cat_weighted, X_text_weighted])
-    
+        print("3. Combining & weighting features...")
+        X_num *= self.weights['numerical']
+        X_cat *= self.weights['categorical']
+        X_text *= self.weights['text']
+
+        self.feature_matrix = hstack([X_num, X_cat, X_text]).tocsr()
+        print("   -> Final feature matrix shape:", self.feature_matrix.shape)
+
     def filter_function(self, query_uid):
-        MALE_GENDERS = ['Male', 'Transgender Male', 'Genderfluid'] 
-        FEMALE_GENDERS = ['Female', 'Transgender Female', 'Genderfluid']
-        NON_BINARY_GENDERS = ['Non-binary', 'Genderfluid']
-        
-        
         GENDER_CATEGORY_MAP = {
-            'Male': 'male', 'Transgender': 'transgender', 'Female': 'female', 
-            'Non-binary': 'non_binary', 'Genderfluid': 'non_binary', 'Prefer Not to Say': 'other'
-        }
-        
-        ORIENTATION_PREFERENCES = {
-            'Straight': {'Male': ['female', 'transgender'], 'Female': ['male', 'transgender']},
-            'Gay': {'Male': ['male', 'transgender'], 'Female': ['female', 'transgender']},
-            'Lesbian': {'Female': ['female', 'transgender']},
-            'Bisexual': {'Male': ['female', 'male', 'transgender', 'non_binary'], 
-                         'Female': ['female', 'male', 'transgender', 'non_binary']},
-            'Pansexual': {'Male': ['female', 'male', 'transgender', 'non_binary'],
-                          'Female': ['female', 'male', 'transgender', 'non_binary']},
-            'Queer': {'Male': ['female', 'male', 'transgender', 'non_binary'],
-                      'Female': ['female', 'male', 'transgender', 'non_binary']},
-            'Asexual': {'Male': ['female', 'male', 'transgender', 'non_binary'],
-                        'Female': ['female', 'male', 'transgender', 'non_binary']},
-            'Demisexual': {'Male': ['female', 'male', 'transgender', 'non_binary'],
-                           'Female': ['female', 'male', 'transgender', 'non_binary']},
+            'Male': 'male', 'Transgender Male': 'male',
+            'Female': 'female', 'Transgender Female': 'female',
+            'Non-binary': 'non_binary', 'Genderfluid': 'non_binary',
+            'Transgender': 'transgender',
+            'Prefer Not to Say': 'other'
         }
 
-        def get_gender_category(gender):
-            return GENDER_CATEGORY_MAP.get(gender, 'other')
-            
-        try:
-            query_user = self.df[self.df['uid'] == query_uid].iloc[0]
-        except IndexError:
+        ORIENTATION_PREFERENCES = {
+            'Straight': {
+                'Male': ['female', 'transgender'],
+                'Female': ['male', 'transgender']
+            },
+            'Gay': {
+                'Male': ['male', 'transgender'],
+                'Female': ['female', 'transgender']
+            },
+            'Lesbian': {
+                'Female': ['female', 'transgender']
+            },
+            'Bisexual': {
+                'Male': ['female', 'male', 'transgender', 'non_binary'],
+                'Female': ['female', 'male', 'transgender', 'non_binary']
+            },
+            'Pansexual': {
+                'Male': ['female', 'male', 'transgender', 'non_binary'],
+                'Female': ['female', 'male', 'transgender', 'non_binary']
+            },
+            'Queer': {
+                'Male': ['female', 'male', 'transgender', 'non_binary'],
+                'Female': ['female', 'male', 'transgender', 'non_binary']
+            },
+            'Asexual': {
+                'Male': ['female', 'male', 'transgender', 'non_binary'],
+                'Female': ['female', 'male', 'transgender', 'non_binary']
+            },
+            'Demisexual': {
+                'Male': ['female', 'male', 'transgender', 'non_binary'],
+                'Female': ['female', 'male', 'transgender', 'non_binary']
+            },
+        }
+
+        def get_gender_category(g):
+            return GENDER_CATEGORY_MAP.get(g, 'other')
+
+        # --- Get query user ---
+        user_row = self.df[self.df['uid'] == query_uid]
+        if user_row.empty:
             return pd.Index([])
 
-        query_gender = query_user['gender']
-        query_orientation = query_user['sexual_orientation']
-        
-        # Exclude the query user from potential candidates
+        query_user = user_row.iloc[0]
+        q_gender = query_user['gender']
+        q_orientation = query_user['sexual_orientation']
+
+        # Exclude themselves
         candidate_df = self.df[self.df['uid'] != query_uid].copy()
-        
-        query_pref_genders = []
-        # Use query_gender to determine the applicable preferences
-        if query_orientation in ORIENTATION_PREFERENCES and query_gender in ORIENTATION_PREFERENCES[query_orientation]:
-            query_pref_categories = ORIENTATION_PREFERENCES[query_orientation][query_gender]
-            
-            # Map the categories back to the full list of acceptable gender strings
-            for category in query_pref_categories:
-                if category == 'male':
-                    query_pref_genders.extend(['Male', 'Transgender', 'Genderfluid'])
-                elif category == 'female':
-                    query_pref_genders.extend(['Female', 'Transgender', 'Genderfluid'])
-                elif category == 'non_binary':
-                    query_pref_genders.extend(['Non-binary', 'Genderfluid'])
-                    
-            # Filter candidates based on the query user's preference
-            candidate_df['pass_query_pref'] = candidate_df['gender'].apply(
-                lambda x: x in query_pref_genders
-            )
+
+        # --- Query user's preference ---
+        acceptable_gender_values = []
+        if q_orientation in ORIENTATION_PREFERENCES and q_gender in ORIENTATION_PREFERENCES[q_orientation]:
+            pref_categories = ORIENTATION_PREFERENCES[q_orientation][q_gender]
+
+            for cat in pref_categories:
+                if cat == 'male':
+                    acceptable_gender_values.extend(['Male', 'Transgender Male'])
+                elif cat == 'female':
+                    acceptable_gender_values.extend(['Female', 'Transgender Female'])
+                elif cat == 'non_binary':
+                    acceptable_gender_values.extend(['Non-binary', 'Genderfluid'])
+                elif cat == 'transgender':
+                    acceptable_gender_values.extend(['Transgender Male', 'Transgender Female'])
+
+            candidate_df['pass_query_pref'] = candidate_df['gender'].isin(acceptable_gender_values)
         else:
             candidate_df['pass_query_pref'] = True
-            
-        # The query user's gender must be desired by the candidate.
 
-        def check_candidate_pref(candidate):
-            cand_gender = candidate['gender']
-            cand_orientation = candidate['sexual_orientation']
-            
-            if cand_orientation in ORIENTATION_PREFERENCES and cand_gender in ORIENTATION_PREFERENCES[cand_orientation]:
-                cand_pref_categories = ORIENTATION_PREFERENCES[cand_orientation][cand_gender]
-                return get_gender_category(query_gender) in cand_pref_categories
-            
+        # --- Candidate's preference toward the query user ---
+        def candidate_likes_query_user(row):
+            gender = row['gender']
+            orientation = row['sexual_orientation']
+            if orientation in ORIENTATION_PREFERENCES and gender in ORIENTATION_PREFERENCES[orientation]:
+                return get_gender_category(q_gender) in ORIENTATION_PREFERENCES[orientation][gender]
             return True
-        
-        candidate_df['pass_candidate_pref'] = candidate_df.apply(check_candidate_pref, axis=1)
-        filtered_df = candidate_df[candidate_df['pass_query_pref'] & candidate_df['pass_candidate_pref']]
-        
-        return filtered_df.index
 
+        candidate_df['pass_candidate_pref'] = candidate_df.apply(candidate_likes_query_user, axis=1)
+
+        final_filtered = candidate_df[candidate_df['pass_query_pref'] & candidate_df['pass_candidate_pref']]
+        return final_filtered.index
 
     def recommend(self, query_uid, top_n=10):
-        """
-        Calculates cosine similarity between the query user and all other users,
-        after applying a 'gender/orientation' filter.
-        """
         if self.feature_matrix is None:
-            print("Error: Model not fitted. Please call .fit() first.")
+            print("Model not fitted. Call .fit() first.")
             return pd.DataFrame()
 
-        try:
-            query_index = self.df[self.df['uid'] == query_uid].index[0]
-        except IndexError:
-            print(f"Error: User ID '{query_uid}' not found in the dataset.")
+        user_rows = self.df[self.df['uid'] == query_uid]
+        if user_rows.empty:
+            print("User ID not found:", query_uid)
             return pd.DataFrame()
 
+        query_index = user_rows.index[0]
         filtered_indices = self.filter_function(query_uid)
-        
-        if filtered_indices.empty:
-            print(f"No suitable candidates found after filtering for user '{query_uid}'.")
+
+        if len(filtered_indices) == 0:
+            print("No suitable matches found.")
             return pd.DataFrame()
-        
-        query_vector = self.feature_matrix.getrow(query_index) # type: ignore
-        
-        candidate_rows = self.df.index.get_indexer(filtered_indices)
-        candidate_matrix = self.feature_matrix[candidate_rows]
 
-        # Calculate similarity only between the query user and the filtered candidates
-        similarity_scores = cosine_similarity(query_vector, candidate_matrix).flatten() # type: ignore
+        query_vec = self.feature_matrix.getrow(query_index)
+        candidate_matrix = self.feature_matrix[filtered_indices]
 
-        # Create a series of scores mapped back to the filtered indices
-        score_series = pd.Series(similarity_scores, index=filtered_indices)
+        sims = cosine_similarity(query_vec, candidate_matrix).flatten()
+        score_series = pd.Series(sims, index=filtered_indices)
 
-        # Get the top N indices from the filtered and scored series
-        top_indices = score_series.nlargest(top_n).index
-        
-        recommendations = self.df.loc[top_indices, ['uid', 'name', 'gender', 'age', 'interest_tags']].copy()
-        recommendations['similarity_score'] = score_series.loc[top_indices].values
-        
-        return recommendations.sort_values(by='similarity_score', ascending=False)
+        top_idx = score_series.nlargest(top_n).index
+
+        result = self.df.loc[top_idx, ['uid', 'name', 'gender', 'age', 'interest_tags']].copy()
+        result['similarity_score'] = score_series.loc[top_idx].values
+        return result.sort_values(by='similarity_score', ascending=False)
 
 
 
@@ -193,16 +194,19 @@ class HybridRecommender:
 
 def test_recommend():
     candidates = get_all_user_profiles()
-    query_user = candidates[0]
+    query_user = candidates[8]
+
+    # candidates = get_all_user_profiles_from_csv()
+    # query_user = candidates.iloc[8, :]
 
     print(query_user)
 
-    # candidates_df = pd.DataFrame(candidates)
-    # recommender = HybridRecommender(candidates_df)
-    # recommender.fit()
+    candidates_df = pd.DataFrame(candidates)
+    recommender = HybridRecommender(candidates)
+    recommender.fit()
 
-    # top_matches = recommender.recommend(query_user["uid"], top_n=10)
-    # print(top_matches)
+    top_matches = recommender.recommend(query_user["uid"], top_n=10)
+    print(top_matches)
 
 
 

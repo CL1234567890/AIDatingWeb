@@ -5,6 +5,7 @@ from firebase_admin import auth, credentials, firestore
 import os
 from typing import Optional
 import random
+import pandas as pd
 
 
 
@@ -26,11 +27,7 @@ def get_user_profile(user_id):
     location: str,
     income_bracket: str,
     education_level: str,
-    interest_tags: str,
-    likes_received: int,
-    mutual_matches: int,
-    app_usage_time_label: str,
-    app_usage_time_min: int
+    interest_tags: str
     """
 
     profile_ref = db.collection('profile').document(user_id)
@@ -53,7 +50,10 @@ def get_all_user_profiles():
         profile_data = doc.to_dict()
         profile_data['document_id'] = doc.id 
         profiles_list.append(profile_data)
-        print(profile_data)
 
     return profiles_list
 
+
+def get_all_user_profiles_from_csv():
+    df = pd.read_csv("final_profiles.csv")
+    return df

@@ -208,3 +208,6 @@ __marimo__/
 frontend/node_modules
 
 firebase-config.js
+*dating_venv/*
+
+backend/dating_venv/

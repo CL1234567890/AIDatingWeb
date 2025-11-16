@@ -5,6 +5,7 @@ Main application entry point
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from datetime import datetime
+from app.routes import ai_date_plan
 import os
 
 # Import Firebase initialization
@@ -99,10 +100,10 @@ async def test_auth(user: dict = Depends(get_current_user)):
     }
 
 # TODO: Import route modules here when they're created
-# Example:
-# from app.routes import matches, ai_date_plan, ai_icebreaker
-# app.include_router(matches.router, prefix="/api/matches", tags=["matches"])
-# app.include_router(ai_date_plan.router, prefix="/api/ai", tags=["ai"])
+app.include_router(
+    ai_date_plan.router,
+    prefix="/api",   # 最终路径会是 /api/ai/dates/plan
+)
 
 if __name__ == "__main__":
     import uvicorn

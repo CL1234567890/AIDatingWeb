@@ -42,8 +42,8 @@ const Login = () => {
 
   return (
     <div className="auth-card">
-      <h1 className="auth-title">Welcome back</h1>
-      <p className="auth-subtitle">
+      <h2>Welcome back</h2>
+      <p className="subtext">
         Log in to see your AI-curated matches.
       </p>
 
@@ -61,36 +61,41 @@ const Login = () => {
       )}
 
       <form className="auth-form" onSubmit={handleSubmit}>
-        <label className="auth-label">
-          Email
+        <div className="form-group">
+          <div className="label-row">
+            <span className="label">Email</span>
+          </div>
           <input
             type="email"
-            className="auth-input"
+            className="input"
             placeholder="you@example.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
           />
-        </label>
+        </div>
 
-        <label className="auth-label">
-          Password
+        <div className="form-group">
+          <div className="label-row">
+            <span className="label">Password</span>
+          </div>
           <input
             type="password"
-            className="auth-input"
+            className="input"
             placeholder="••••••••"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
           />
-        </label>
+        </div>
 
-        <button type="submit" className="auth-button" disabled={loading}>
+        <button type="submit" className="primary-button" disabled={loading}>
           {loading ? "Logging in..." : "Log in"}
         </button>
 
-        <p className="auth-hint">
-          New here? <Link to="/register">Create an account</Link>
+        <p className="secondary-text">
+          New here?{" "}
+          <Link to="/register">Create an account</Link>
         </p>
       </form>
     </div>

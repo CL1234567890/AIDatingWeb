@@ -211,3 +211,10 @@ firebase-config.js
 *dating_venv/*
 
 backend/dating_venv/
+
+# Firebase Admin Service Account (NEVER COMMIT THIS!)
+backend/firebase-service-account.json
+*firebase-service-account*.json
+
+# Backend environment variables
+backend/.env

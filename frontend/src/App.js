@@ -15,6 +15,7 @@ import DatePlanner from "./pages/DatePlannar";
 import Matches from "./pages/Matches";
 import Chat from "./pages/Chat";
 import Dashboard from "./pages/Dashboard";
+import TestAuth from "./pages/TestAuth";
 
 const ProtectedRoute = ({ children }) => {
   const { currentUser } = useAuth();
@@ -99,6 +100,15 @@ function AppContent() {
             element={
               <ProtectedRoute>
                 <Chat />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/test-auth"
+            element={
+              <ProtectedRoute>
+                <TestAuth />
               </ProtectedRoute>
             }
           />

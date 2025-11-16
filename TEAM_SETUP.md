@@ -70,7 +70,7 @@ cd backend
 
 `python -m venv dating_venv` - to create virtual environment. Make sure your python version matches `3.12.2`.
 
-`source /dating_venv/bin/activate` - activate virtual environment. If you have permission problems, `chmod +x /dating_venv/bin/activate` then try again.
+`source dating_venv/bin/activate` - activate virtual environment. If you have permission problems, `chmod +x /dating_venv/bin/activate` then try again.
 
 `pip install -r requirements.txt`
 

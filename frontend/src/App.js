@@ -16,6 +16,7 @@ import Matches from "./pages/Matches";
 import Chat from "./pages/Chat";
 import Dashboard from "./pages/Dashboard";
 import TestAuth from "./pages/TestAuth";
+import TestIcebreaker from "./pages/TestIcebreaker";
 
 const ProtectedRoute = ({ children }) => {
   const { currentUser } = useAuth();
@@ -109,6 +110,15 @@ function AppContent() {
             element={
               <ProtectedRoute>
                 <TestAuth />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/test-icebreaker"
+            element={
+              <ProtectedRoute>
+                <TestIcebreaker />
               </ProtectedRoute>
             }
           />

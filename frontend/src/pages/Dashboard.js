@@ -14,34 +14,6 @@ const Dashboard = () => {
         browse your AI-curated matches.
       </p>
 
-      {/* User ID Display for Testing */}
-      {currentUser && (
-        <div style={{
-          marginTop: 10,
-          padding: '10px 12px',
-          background: 'rgba(59, 130, 246, 0.1)',
-          border: '1px solid rgba(59, 130, 246, 0.3)',
-          borderRadius: 8,
-          fontSize: 12,
-          fontFamily: 'monospace'
-        }}>
-          <div style={{ color: 'var(--text-secondary)', marginBottom: 4 }}>
-            Your User ID (for testing):
-          </div>
-          <div style={{ 
-            color: 'var(--text-primary)',
-            wordBreak: 'break-all',
-            userSelect: 'all',
-            cursor: 'text'
-          }}>
-            {currentUser.uid}
-          </div>
-          <div style={{ color: 'var(--text-secondary)', marginTop: 4, fontSize: 11 }}>
-            Click to select, then copy (Ctrl+C / Cmd+C)
-          </div>
-        </div>
-      )}
-
       <div
         style={{
           marginTop: 18,
@@ -80,20 +52,6 @@ const Dashboard = () => {
           }}
         >
           View messages
-        </Link>
-
-        <Link
-          to="/test-users"
-          className="nav-btn nav-ghost"
-          style={{
-            textAlign: "center",
-            textDecoration: "none",
-            width: "100%",
-            background: "rgba(59, 130, 246, 0.1)",
-            borderColor: "rgba(59, 130, 246, 0.3)",
-          }}
-        >
-          🧪 Test Chat (All Users)
         </Link>
       </div>
     </div>

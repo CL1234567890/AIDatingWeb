@@ -17,9 +17,6 @@ import Chat from "./pages/Chat";
 import ChatList from "./pages/ChatList";
 import ChatConversation from "./pages/ChatConversation";
 import Dashboard from "./pages/Dashboard";
-import TestAuth from "./pages/TestAuth";
-import TestUsers from "./pages/TestUsers";
-import TestIcebreaker from "./pages/TestIcebreaker";
 import MyProfile from "./pages/MyProfile";
 import ViewProfile from "./pages/ViewProfile";
 
@@ -124,33 +121,6 @@ function AppContent() {
             element={
               <ProtectedRoute>
                 <ChatConversation />
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path="/test-auth"
-            element={
-              <ProtectedRoute>
-                <TestAuth />
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path="/test-users"
-            element={
-              <ProtectedRoute>
-                <TestUsers />
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path="/test-icebreaker"
-            element={
-              <ProtectedRoute>
-                <TestIcebreaker />
               </ProtectedRoute>
             }
           />

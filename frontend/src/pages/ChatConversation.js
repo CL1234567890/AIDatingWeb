@@ -5,8 +5,10 @@ import {
   getOrCreateConversation, 
   subscribeToMessages, 
   sendMessage,
-  markMessagesAsRead 
+  markMessagesAsRead,
+  getMessageCount
 } from '../services/chatService';
+import IcebreakerSelector from '../components/IcebreakerSelector';
 
 const ChatConversation = () => {
   const { matchId } = useParams();
@@ -19,6 +21,7 @@ const ChatConversation = () => {
   const [sending, setSending] = useState(false);
   const [error, setError] = useState(null);
   const [otherUserName, setOtherUserName] = useState('User');
+  const [showIcebreakers, setShowIcebreakers] = useState(false);
   const messagesEndRef = useRef(null);
 
   // Initialize conversation on mount
@@ -27,8 +30,14 @@ const ChatConversation = () => {
       try {
         setLoading(true);
         setError(null);
-        const convId = await getOrCreateConversation(currentUser.uid, matchId);
+        const { conversationId: convId, isNew } = await getOrCreateConversation(currentUser.uid, matchId);
         setConversationId(convId);
+        
+        // Check if there are any messages - show icebreakers if empty
+        // (works for both new conversations and existing ones with no messages)
+        const messageCount = await getMessageCount(convId);
+        setShowIcebreakers(messageCount === 0);
+        
         setLoading(false);
       } catch (err) {
         console.error('Error initializing chat:', err);
@@ -48,6 +57,10 @@ const ChatConversation = () => {
 
     const unsubscribe = subscribeToMessages(conversationId, (newMessages) => {
       setMessages(newMessages);
+      // Hide icebreakers once messages exist
+      if (newMessages.length > 0) {
+        setShowIcebreakers(false);
+      }
     });
 
     return () => unsubscribe();
@@ -70,6 +83,17 @@ const ChatConversation = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  // Handle icebreaker selection
+  const handleIcebreakerSelect = (icebreaker) => {
+    setInput(icebreaker);
+    setShowIcebreakers(false);
+  };
+
+  // Handle skip icebreakers
+  const handleSkipIcebreakers = () => {
+    setShowIcebreakers(false);
+  };
+
   // Handle send message
   const handleSendMessage = async () => {
     if (!input.trim() || !conversationId || sending) return;
@@ -79,6 +103,7 @@ const ChatConversation = () => {
       setError(null);
       await sendMessage(conversationId, currentUser.uid, input.trim());
       setInput('');
+      setShowIcebreakers(false); // Hide icebreakers after first message
     } catch (err) {
       console.error('Error sending message:', err);
       setError('Failed to send message. Please try again.');
@@ -108,15 +133,18 @@ const ChatConversation = () => {
 
   if (loading) {
     return (
-      <div className="auth-card">
-        <h2>Loading Chat...</h2>
-        <p className="subtext">Please wait while we load your conversation.</p>
+      <div style={{ width: '100%', maxWidth: '620px', margin: '0 auto' }}>
+        <div className="auth-card">
+          <h2>Loading Chat...</h2>
+          <p className="subtext">Please wait while we load your conversation.</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="auth-card">
+    <div style={{ width: '100%', maxWidth: '620px', margin: '0 auto' }}>
+      <div className="auth-card">
       <div style={{ display: 'flex', alignItems: 'center', marginBottom: 15 }}>
         <button
           type="button"
@@ -149,10 +177,19 @@ const ChatConversation = () => {
         </div>
       )}
 
+      {/* Icebreaker Selector - shown for new conversations */}
+      {showIcebreakers && (
+        <IcebreakerSelector
+          recipientId={matchId}
+          onSelect={handleIcebreakerSelect}
+          onSkip={handleSkipIcebreakers}
+        />
+      )}
+
       {/* Messages Container */}
       <div
         style={{
-          marginTop: 10,
+          marginTop: showIcebreakers ? 0 : 10,
           marginBottom: 10,
           maxHeight: 400,
           minHeight: 300,
@@ -247,6 +284,7 @@ const ChatConversation = () => {
         <div style={{ fontSize: 12, color: 'var(--text-secondary)', textAlign: 'right' }}>
           {input.length}/1000 characters
         </div>
+      </div>
       </div>
     </div>
   );

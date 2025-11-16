@@ -24,7 +24,7 @@ import {
  * Get or create a conversation between two users
  * @param {string} currentUserId - Current user's UID
  * @param {string} otherUserId - Other user's UID
- * @returns {Promise<string>} - Conversation ID
+ * @returns {Promise<{conversationId: string, isNew: boolean}>} - Conversation ID and whether it's new
  */
 export const getOrCreateConversation = async (currentUserId, otherUserId) => {
   try {
@@ -47,7 +47,7 @@ export const getOrCreateConversation = async (currentUserId, otherUserId) => {
     });
     
     if (existingConversation) {
-      return existingConversation;
+      return { conversationId: existingConversation, isNew: false };
     }
     
     // Get user details for both participants
@@ -78,10 +78,26 @@ export const getOrCreateConversation = async (currentUserId, otherUserId) => {
     };
     
     const docRef = await addDoc(conversationsRef, newConversation);
-    return docRef.id;
+    return { conversationId: docRef.id, isNew: true };
   } catch (error) {
     console.error('Error getting/creating conversation:', error);
     throw error;
+  }
+};
+
+/**
+ * Get message count for a conversation
+ * @param {string} conversationId - Conversation ID
+ * @returns {Promise<number>} - Number of messages
+ */
+export const getMessageCount = async (conversationId) => {
+  try {
+    const messagesRef = collection(db, 'conversations', conversationId, 'messages');
+    const querySnapshot = await getDocs(messagesRef);
+    return querySnapshot.size;
+  } catch (error) {
+    console.error('Error getting message count:', error);
+    return 0;
   }
 };
 

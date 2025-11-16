@@ -84,14 +84,15 @@ const ChatList = () => {
   }
 
   return (
-    <div className="auth-card">
-      <h2>Messages</h2>
-      <p className="subtext">
-        {conversations.length === 0 
-          ? 'No conversations yet. Start chatting with your matches!' 
-          : `${conversations.length} conversation${conversations.length !== 1 ? 's' : ''}`
-        }
-      </p>
+    <div style={{ width: '100%', maxWidth: '520px', margin: '0 auto' }}>
+      <div className="auth-card">
+        <h2>Messages</h2>
+        <p className="subtext">
+          {conversations.length === 0 
+            ? 'No conversations yet. Start chatting with your matches!' 
+            : `${conversations.length} conversation${conversations.length !== 1 ? 's' : ''}`
+          }
+        </p>
 
       {conversations.length === 0 ? (
         <div style={{
@@ -115,7 +116,7 @@ const ChatList = () => {
           </button>
         </div>
       ) : (
-        <div style={{ marginTop: 15 }}>
+        <div style={{ marginTop: 15, maxWidth: '100%' }}>
           {conversations.map((conversation) => {
             const otherUser = getOtherUser(conversation);
             const lastMessage = conversation.lastMessage;
@@ -137,6 +138,8 @@ const ChatList = () => {
                   border: '1px solid var(--border-subtle)',
                   cursor: 'pointer',
                   transition: 'all 0.2s ease',
+                  maxWidth: '100%',
+                  overflow: 'hidden',
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.background = 'rgba(236, 72, 153, 0.15)';
@@ -204,6 +207,7 @@ const ChatList = () => {
           })}
         </div>
       )}
+      </div>
     </div>
   );
 };

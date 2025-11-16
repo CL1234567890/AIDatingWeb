@@ -28,7 +28,7 @@ import {
  */
 export const getOrCreateConversation = async (currentUserId, otherUserId) => {
   try {
-    // Query for existing conversation with both participants
+    // First check for existing conversation (with old random ID system)
     const conversationsRef = collection(db, 'conversations');
     const q = query(
       conversationsRef,
@@ -38,17 +38,17 @@ export const getOrCreateConversation = async (currentUserId, otherUserId) => {
     const querySnapshot = await getDocs(q);
     
     // Check if conversation with both users exists
-    let existingConversation = null;
-    querySnapshot.forEach((doc) => {
-      const data = doc.data();
+    for (const docSnapshot of querySnapshot.docs) {
+      const data = docSnapshot.data();
       if (data.participants.includes(otherUserId)) {
-        existingConversation = doc.id;
+        return { conversationId: docSnapshot.id, isNew: false };
       }
-    });
-    
-    if (existingConversation) {
-      return { conversationId: existingConversation, isNew: false };
     }
+    
+    // No existing conversation found, create new one with deterministic ID
+    const sortedIds = [currentUserId, otherUserId].sort();
+    const conversationId = `${sortedIds[0]}_${sortedIds[1]}`;
+    const conversationRef = doc(db, 'conversations', conversationId);
     
     // Get user details for both participants
     const currentUserDoc = await getDoc(doc(db, 'users', currentUserId));
@@ -57,9 +57,9 @@ export const getOrCreateConversation = async (currentUserId, otherUserId) => {
     const currentUserData = currentUserDoc.data();
     const otherUserData = otherUserDoc.data();
     
-    // Create new conversation
+    // Create new conversation with deterministic ID
     const newConversation = {
-      participants: [currentUserId, otherUserId],
+      participants: sortedIds,
       participantDetails: {
         [currentUserId]: {
           name: currentUserData?.profile?.name || currentUserData?.email || 'User',
@@ -77,8 +77,9 @@ export const getOrCreateConversation = async (currentUserId, otherUserId) => {
       updatedAt: serverTimestamp()
     };
     
-    const docRef = await addDoc(conversationsRef, newConversation);
-    return { conversationId: docRef.id, isNew: true };
+    // Use setDoc with the deterministic ID to prevent duplicates
+    await setDoc(conversationRef, newConversation);
+    return { conversationId: conversationId, isNew: true };
   } catch (error) {
     console.error('Error getting/creating conversation:', error);
     throw error;

@@ -31,6 +31,12 @@ const ChatConversation = () => {
         setLoading(true);
         setError(null);
         const { conversationId: convId, isNew } = await getOrCreateConversation(currentUser.uid, matchId);
+        
+        // Wait a bit for Firestore to fully create the conversation if it's new
+        if (isNew) {
+          await new Promise(resolve => setTimeout(resolve, 500));
+        }
+        
         setConversationId(convId);
         
         // Check if there are any messages - show icebreakers if empty

@@ -1,7 +1,6 @@
 // src/pages/DatePlanner.js
 import React, { useState } from "react";
-// later you’ll import your real API client
-// import { planDate } from "../api/dates";
+import { planDate } from "../services/api";
 
 const DatePlanner = () => {
   const [mood, setMood] = useState("");
@@ -17,42 +16,20 @@ const DatePlanner = () => {
     e.preventDefault();
     setLoading(true);
     setError("");
+    setPlan(null);
 
     try {
-      // TODO: replace with real backend call
-      // const result = await planDate({ mood, budget, indoorOutdoor, distance, timeOfDay });
-      // setPlan(result);
-
-      // temporary mock so UI works without backend
-      const mock = {
-        summary:
-          "Chill cozy date: café + riverside walk that matches your calm, introspective mood.",
-        locations: [
-          {
-            id: 1,
-            name: "Moonlight Café",
-            address: "123 Main St",
-            type: "Coffee & dessert",
-            startTime: "18:30",
-            duration: "1.5h",
-          },
-          {
-            id: 2,
-            name: "Riverside Park",
-            address: "Riverside Trail",
-            type: "Walk / viewpoint",
-            startTime: "20:15",
-            duration: "1h",
-          },
-        ],
-        routeUrl:
-          "https://www.google.com/maps/dir/?api=1&destination=Riverside+Park",
-      };
-
-      setPlan(mock);
+      const result = await planDate({ 
+        mood, 
+        budget, 
+        indoorOutdoor, 
+        distance, 
+        timeOfDay 
+      });
+      setPlan(result);
     } catch (err) {
       console.error(err);
-      setError("Could not generate plan. Please try again.");
+      setError(err.message || "Could not generate plan. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -167,9 +144,9 @@ const DatePlanner = () => {
           </p>
 
           <div style={{ marginTop: "12px" }}>
-            {plan.locations.map((loc) => (
+            {plan.locations.map((loc, index) => (
               <div
-                key={loc.id}
+                key={`${loc.name}-${index}`}
                 style={{
                   borderRadius: "14px",
                   border: "1px solid var(--border-subtle)",
@@ -181,8 +158,6 @@ const DatePlanner = () => {
                 <div style={{ fontWeight: 600 }}>{loc.name}</div>
                 <div className="secondary-text" style={{ textAlign: "left" }}>
                   {loc.type} · {loc.address}
-                  <br />
-                  ⏰ {loc.startTime} • {loc.duration}
                 </div>
               </div>
             ))}

@@ -95,5 +95,40 @@ export async function testAuth() {
   }
 }
 
+/**
+ * Generate AI-powered date plan based on mood and preferences
+ * 
+ * @param {Object} params - Date planning parameters
+ * @param {string} params.mood - User's mood/vibe description
+ * @param {string} params.budget - Budget level: 'low', 'medium', 'high'
+ * @param {string} params.indoorOutdoor - Preference: 'indoor', 'outdoor', 'either'
+ * @param {number} params.distance - Max distance in km
+ * @param {string} params.timeOfDay - Time preference: 'morning', 'afternoon', 'evening', 'late-night'
+ * @param {number} [params.latitude] - User's latitude (optional, defaults to Atlanta)
+ * @param {number} [params.longitude] - User's longitude (optional, defaults to Atlanta)
+ * @returns {Promise<Object>} Date plan with summary, locations array, and routeUrl
+ */
+export async function planDate(params) {
+  try {
+    const data = await authenticatedFetch('/api/ai/dates/plan', {
+      method: 'POST',
+      body: JSON.stringify({
+        mood: params.mood,
+        budget: params.budget,
+        indoorOutdoor: params.indoorOutdoor,
+        distance: parseFloat(params.distance),
+        timeOfDay: params.timeOfDay,
+        latitude: params.latitude,
+        longitude: params.longitude,
+      }),
+    });
+    
+    return data;
+  } catch (error) {
+    console.error('Error generating date plan:', error);
+    throw error;
+  }
+}
+
 // Export API base URL for other services
 export { API_BASE_URL };

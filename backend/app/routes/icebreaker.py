@@ -11,7 +11,10 @@ from app.services.ai_service import get_ai_service
 
 
 # Router instance
-router = APIRouter()
+router = APIRouter(
+    prefix="/api/icebreaker",
+    tags=["icebreaker"]
+)
 
 
 # Request models

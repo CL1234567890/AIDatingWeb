@@ -218,3 +218,5 @@ backend/firebase-service-account.json
 
 # Backend environment variables
 backend/.env
+backend_datePlaner/.env
+.idea/*

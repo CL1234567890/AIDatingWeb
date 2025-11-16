@@ -140,17 +140,17 @@ async def generate_icebreaker(
                 detail="Failed to generate icebreaker"
             )
         
-        # Prepare response with basic user info
+        # Prepare response with basic user info (new flat profile structure)
         sender_info = {
             "uid": sender_id,
-            "name": sender_profile.get('profile', {}).get('name', 'Unknown'),
+            "name": sender_profile.get('name', 'Unknown'),
             "email": sender_profile.get('email')
         }
         
         recipient_info = {
             "uid": recipient_id,
-            "name": recipient_profile.get('profile', {}).get('name', 'Unknown'),
-            "interests": recipient_profile.get('profile', {}).get('interests', [])
+            "name": recipient_profile.get('name', 'Unknown'),
+            "interests": recipient_profile.get('interest_tags', '').split(',') if recipient_profile.get('interest_tags') else []
         }
         
         return IcebreakerResponse(

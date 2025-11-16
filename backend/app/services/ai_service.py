@@ -41,16 +41,20 @@ class AIService:
         Returns:
             Formatted prompt string
         """
-        # Extract relevant information from profiles
-        sender_name = sender_profile.get('profile', {}).get('name', 'User')
-        recipient_name = recipient_profile.get('profile', {}).get('name', 'the match')
+        # Extract relevant information from profiles (new flat structure)
+        sender_name = sender_profile.get('name', 'User')
+        recipient_name = recipient_profile.get('name', 'the match')
         
-        # Get interests
-        recipient_interests = recipient_profile.get('profile', {}).get('interests', [])
-        sender_interests = sender_profile.get('profile', {}).get('interests', [])
+        # Get interests from interest_tags (comma-separated string)
+        recipient_interest_tags = recipient_profile.get('interest_tags', '')
+        recipient_interests = [tag.strip() for tag in recipient_interest_tags.split(',') if tag.strip()]
         
-        # Get bio
-        recipient_bio = recipient_profile.get('profile', {}).get('bio', '')
+        sender_interest_tags = sender_profile.get('interest_tags', '')
+        sender_interests = [tag.strip() for tag in sender_interest_tags.split(',') if tag.strip()]
+        
+        # Get other profile info
+        recipient_location = recipient_profile.get('location', '')
+        recipient_age = recipient_profile.get('age', '')
         
         # Build interests string
         interests_str = ', '.join(recipient_interests) if recipient_interests else 'various activities'
@@ -65,7 +69,8 @@ class AIService:
 RECIPIENT'S PROFILE:
 - Name: {recipient_name}
 - Interests: {interests_str}
-{f'- Bio: {recipient_bio}' if recipient_bio else ''}
+{f'- Location: {recipient_location}' if recipient_location else ''}
+{f'- Age: {recipient_age}' if recipient_age else ''}
 
 SENDER'S INTERESTS: {sender_interests_str}
 {f'COMMON INTERESTS: {common_str}' if common_str else ''}
@@ -159,9 +164,14 @@ Generate ONLY the icebreaker message text (no quotes, no preamble, just the mess
         Returns:
             Simple icebreaker message
         """
-        recipient_name = recipient_profile.get('profile', {}).get('name', 'there')
-        recipient_interests = recipient_profile.get('profile', {}).get('interests', [])
-        sender_interests = sender_profile.get('profile', {}).get('interests', [])
+        recipient_name = recipient_profile.get('name', 'there')
+        
+        # Parse interest tags
+        recipient_interest_tags = recipient_profile.get('interest_tags', '')
+        recipient_interests = [tag.strip() for tag in recipient_interest_tags.split(',') if tag.strip()]
+        
+        sender_interest_tags = sender_profile.get('interest_tags', '')
+        sender_interests = [tag.strip() for tag in sender_interest_tags.split(',') if tag.strip()]
         
         # Find common interests
         common_interests = list(set(sender_interests) & set(recipient_interests))

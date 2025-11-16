@@ -20,9 +20,37 @@ const ChatConversation = () => {
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState(null);
-  const [otherUserName, setOtherUserName] = useState('User');
+  const [otherUserName, setOtherUserName] = useState('Loading...');
   const [showIcebreakers, setShowIcebreakers] = useState(false);
   const messagesEndRef = useRef(null);
+
+  // Fetch other user's profile
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const token = await currentUser.getIdToken();
+        const response = await fetch(`http://localhost:8000/api/user/profile/${matchId}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          setOtherUserName(data.name || 'User');
+        } else {
+          setOtherUserName('User');
+        }
+      } catch (err) {
+        console.error('Error fetching user profile:', err);
+        setOtherUserName('User');
+      }
+    };
+
+    if (currentUser && matchId) {
+      fetchUserProfile();
+    }
+  }, [currentUser, matchId]);
 
   // Initialize conversation on mount
   useEffect(() => {
@@ -167,7 +195,7 @@ const ChatConversation = () => {
         >
           ← 
         </button>
-        <h2 style={{ margin: 0 }}>Chat with Match #{matchId.slice(0, 8)}</h2>
+        <h2 style={{ margin: 0 }}>Chat with {otherUserName}</h2>
       </div>
 
       {error && (

@@ -25,7 +25,7 @@ class FirebaseService:
             Dict with user profile data or None if not found
         """
         try:
-            user_ref = self.db.collection('users').document(user_id)
+            user_ref = self.db.collection('profiles').document(user_id)
             user_doc = user_ref.get()
             
             if not user_doc.exists:
@@ -67,7 +67,7 @@ class FirebaseService:
             List of user profiles
         """
         try:
-            users_ref = self.db.collection('users')
+            users_ref = self.db.collection('profiles')
             
             all_users = []
             for doc in users_ref.stream():

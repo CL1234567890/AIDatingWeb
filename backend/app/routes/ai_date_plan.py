@@ -1,16 +1,19 @@
 # app/routes/ai_date_plan.py
+
 import os
+import json
 import requests
 from typing import List, Optional
 
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException  # Removed Depends for now
 from pydantic import BaseModel, Field
 from dotenv import load_dotenv
 from openai import OpenAI
-# from app.utils.auth import get_current_user
+# from app.utils.auth import get_current_user   # can be re-enabled later
 
 load_dotenv()
 
+# ========= Load Keys =========
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 GOOGLE_MAPS_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY")
 
@@ -26,14 +29,14 @@ router = APIRouter(
     tags=["ai-date-plan"],
 )
 
-# ---------- Pydantic models ----------
+# ========= Pydantic Models =========
 
 class DatePlanRequest(BaseModel):
-    mood: str = Field(..., description="User's current mood")
-    budget: str = Field(..., description="low / medium / high")
-    indoorOutdoor: str = Field(..., description="indoor / outdoor / either")
-    distance: float = Field(..., description="最大距离（km）")
-    timeOfDay: str = Field(..., description="morning / afternoon / evening / late-night")
+    mood: str
+    budget: str
+    indoorOutdoor: str
+    distance: float
+    timeOfDay: str
     latitude: Optional[float] = None
     longitude: Optional[float] = None
 
@@ -52,7 +55,7 @@ class DatePlanResponse(BaseModel):
     routeUrl: Optional[str] = None
 
 
-# ---------- OpenAI helpers ----------
+# ========= OpenAI Helpers (JSON OUTPUT VERSION) =========
 
 def choose_place_types_with_openai(req: DatePlanRequest) -> List[str]:
     allowed_types = [
@@ -66,12 +69,16 @@ def choose_place_types_with_openai(req: DatePlanRequest) -> List[str]:
     ]
 
     system_prompt = (
-        "You are an assistant that designs real-life date ideas. "
-        "Given the user's mood, budget, indoor/outdoor preference, "
-        "max distance and time of day, pick 2 or 3 suitable Google "
-        "Places types from this list only: "
+        "You are an assistant that selects suitable Google Places types for a date.\n"
+        "Return ONLY a JSON object in this exact structure:\n"
+        "{ \"types\": [\"cafe\", \"park\"] }\n\n"
+        "Rules:\n"
+        "- The list MUST contain 2 or 3 items.\n"
+        "- Each type MUST be one of: "
         + ", ".join(allowed_types)
-        + ". Respond ONLY with a comma-separated list of place types."
+        + "\n"
+        "- No comments, no explanations, no additional fields.\n"
+        "- The output MUST be valid JSON."
     )
 
     user_prompt = (
@@ -79,7 +86,7 @@ def choose_place_types_with_openai(req: DatePlanRequest) -> List[str]:
         f"Budget: {req.budget}\n"
         f"Indoor/Outdoor: {req.indoorOutdoor}\n"
         f"Max distance (km): {req.distance}\n"
-        f"Time of day: {req.timeOfDay}"
+        f"Time: {req.timeOfDay}"
     )
 
     completion = client.chat.completions.create(
@@ -88,18 +95,24 @@ def choose_place_types_with_openai(req: DatePlanRequest) -> List[str]:
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt},
         ],
-        temperature=0.5,
+        response_format={"type": "json_object"},
+        temperature=0.3,
     )
 
-    content = completion.choices[0].message.content.strip()
-    types = [t.strip() for t in content.split(",") if t.strip()]
+    data = json.loads(completion.choices[0].message.content)
 
-    filtered = [t for t in types if t in allowed_types]
-    if not filtered:
-        filtered = ["cafe", "park"]
+    types = data.get("types", [])
 
-    return filtered
+    # Safety filter
+    types = [t for t in types if t in allowed_types]
 
+    if not types:
+        types = ["cafe", "park"]
+
+    return types
+
+
+# ========= Summary Generator =========
 
 def build_summary_with_openai(req: DatePlanRequest, places: List[Place]) -> str:
     places_desc = "\n".join(
@@ -119,7 +132,10 @@ def build_summary_with_openai(req: DatePlanRequest, places: List[Place]) -> str:
     completion = client.chat.completions.create(
         model="gpt-4.1-mini",
         messages=[
-            {"role": "system", "content": "You write warm and concise dating suggestions."},
+            {
+                "role": "system",
+                "content": "You write warm and concise romantic date suggestions.",
+            },
             {"role": "user", "content": user_prompt},
         ],
         temperature=0.7,
@@ -128,7 +144,7 @@ def build_summary_with_openai(req: DatePlanRequest, places: List[Place]) -> str:
     return completion.choices[0].message.content.strip()
 
 
-# ---------- Google Places helpers ----------
+# ========= Google Places Helpers =========
 
 def search_place_with_google(
     place_type: str,
@@ -136,6 +152,7 @@ def search_place_with_google(
     lng: float,
     max_distance_km: float,
 ) -> Optional[Place]:
+
     radius_m = int(max_distance_km * 1000)
 
     url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json"
@@ -148,11 +165,11 @@ def search_place_with_google(
     }
 
     resp = requests.get(url, params=params, timeout=10)
+
     if resp.status_code != 200:
         raise HTTPException(status_code=500, detail="Google Places API error")
 
-    data = resp.json()
-    results = data.get("results", [])
+    results = resp.json().get("results", [])
     if not results:
         return None
 
@@ -170,45 +187,51 @@ def search_place_with_google(
     )
 
 
+# ========= Build Route URL =========
+
 def build_route_url(places: List[Place]) -> str:
     if not places:
         return ""
 
     base = "https://www.google.com/maps/dir/?api=1"
-    destination = f"{places[-1].lat},{places[-1].lng}"
+    last = places[-1]
+    destination = f"{last.lat},{last.lng}"
 
     if len(places) > 1:
-        waypoints = "|".join(f"{p.lat},{p.lng}" for p in places[:-1])
+        waypoints = "|".join([f"{p.lat},{p.lng}" for p in places[:-1]])
         return f"{base}&destination={destination}&waypoints={waypoints}"
 
     return f"{base}&destination={destination}"
 
 
+# ========= Main Planning Endpoint =========
 
 @router.post("/dates/plan", response_model=DatePlanResponse)
-async def plan_date(
-    req: DatePlanRequest,
-    # user: dict = Depends(get_current_user),
-) -> DatePlanResponse:
-    # 默认城市：Atlanta
+async def plan_date(req: DatePlanRequest):
+    # Default coordinates: Atlanta
     lat = req.latitude or 33.7490
     lng = req.longitude or -84.3880
 
-    place_types = choose_place_types_with_openai(req)
+    # Step 1: choose place types via OpenAI
+    types = choose_place_types_with_openai(req)
 
+    # Step 2: find places with Google
     places: List[Place] = []
-    for t in place_types:
-        place = search_place_with_google(t, lat, lng, req.distance)
-        if place:
-            places.append(place)
+    for t in types:
+        p = search_place_with_google(t, lat, lng, req.distance)
+        if p:
+            places.append(p)
 
     if not places:
         raise HTTPException(
             status_code=500,
-            detail="Could not find suitable places nearby. Try increasing distance or changing preferences.",
+            detail="No suitable places found nearby. Try adjusting filters.",
         )
 
+    # Step 3: generate human-friendly summary
     summary = build_summary_with_openai(req, places)
+
+    # Step 4: generate route link
     route_url = build_route_url(places)
 
     return DatePlanResponse(summary=summary, locations=places, routeUrl=route_url)

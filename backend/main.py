@@ -7,7 +7,15 @@ from fastapi.middleware.cors import CORSMiddleware
 from datetime import datetime
 
 # Import routes
-from app.routes import ai_date_plan, icebreaker, recommend
+from app.routes import ai_date_plan, icebreaker, profile
+
+# Import recommend module with error handling (sklearn can be slow to load)
+try:
+    from app.routes import recommend
+    recommend_available = True
+except Exception as e:
+    print(f"⚠️  Warning: Could not import recommend module: {e}")
+    recommend_available = False
 
 # Firebase (already provided by teammate)
 from app.utils.auth import initialize_firebase, get_current_user
@@ -99,9 +107,15 @@ async def test_auth(user: dict = Depends(get_current_user)):
     }
 
 # Include routers (each router defines its own prefix and tags)
+app.include_router(profile.router)
 app.include_router(icebreaker.router)
 app.include_router(ai_date_plan.router)
-app.include_router(recommend.router)
+
+# Only include recommend router if it loaded successfully
+if recommend_available:
+    app.include_router(recommend.router)
+else:
+    print("⚠️  Recommend endpoints not available")
 
 # TODO: Add more routes as they're created
 # from app.routes import chat

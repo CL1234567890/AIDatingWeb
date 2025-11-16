@@ -80,6 +80,9 @@ const Navbar = ({ isAuth }) => {
                 </span>
               )}
             </Link>
+            <Link to="/profile" className="nav-btn nav-ghost">
+              Profile
+            </Link>
             <button onClick={handleLogout} className="nav-btn nav-ghost" style={{ cursor: 'pointer' }}>
               Logout
             </button>

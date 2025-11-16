@@ -195,7 +195,21 @@ const ChatConversation = () => {
         >
           ← 
         </button>
-        <h2 style={{ margin: 0 }}>Chat with {otherUserName}</h2>
+        <h2 style={{ margin: 0 }}>
+          Chat with{' '}
+          <span
+            style={{
+              color: '#60a5fa',
+              cursor: 'pointer',
+              textDecoration: 'none'
+            }}
+            onClick={() => navigate(`/profile/${matchId}`)}
+            onMouseEnter={(e) => e.target.style.textDecoration = 'underline'}
+            onMouseLeave={(e) => e.target.style.textDecoration = 'none'}
+          >
+            {otherUserName}
+          </span>
+        </h2>
       </div>
 
       {error && (

@@ -135,7 +135,19 @@ const Matches = () => {
                   alignItems: "baseline",
                 }}
               >
-                <div style={{ fontWeight: 600 }}>{m.name}, {m.age}</div>
+                <div 
+                  style={{ 
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    color: '#60a5fa',
+                    textDecoration: 'none'
+                  }}
+                  onClick={() => navigate(`/profile/${m.uid}`)}
+                  onMouseEnter={(e) => e.target.style.textDecoration = 'underline'}
+                  onMouseLeave={(e) => e.target.style.textDecoration = 'none'}
+                >
+                  {m.name}, {m.age}
+                </div>
                 <div style={{ fontSize: 12, color: "#f472b6" }}>
                   {matchScore}% match
                 </div>

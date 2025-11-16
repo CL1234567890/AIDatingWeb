@@ -159,12 +159,23 @@ const ChatList = () => {
                       alignItems: 'center',
                       marginBottom: 4
                     }}>
-                      <div style={{
-                        fontWeight: isUnread ? 600 : 500,
-                        fontSize: 16,
-                        color: 'var(--text-primary)',
-                        marginRight: 8
-                      }}>
+                      <div 
+                        style={{
+                          fontWeight: isUnread ? 600 : 500,
+                          fontSize: 16,
+                          color: '#60a5fa',
+                          marginRight: 8,
+                          cursor: 'pointer',
+                          textDecoration: 'none'
+                        }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const otherUserId = conversation.participants.find(id => id !== currentUser.uid);
+                          navigate(`/profile/${otherUserId}`);
+                        }}
+                        onMouseEnter={(e) => e.target.style.textDecoration = 'underline'}
+                        onMouseLeave={(e) => e.target.style.textDecoration = 'none'}
+                      >
                         {otherUser.name}
                       </div>
                       {isUnread && (

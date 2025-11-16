@@ -98,9 +98,14 @@ async def test_auth(user: dict = Depends(get_current_user)):
         "timestamp": datetime.now().isoformat()
     }
 
-# TODO: Import route modules here when they're created
-# Example:
-# from app.routes import matches, ai_date_plan, ai_icebreaker
+# Import route modules
+from app.routes import icebreaker
+
+# Include routers
+app.include_router(icebreaker.router, prefix="/api/icebreaker", tags=["icebreaker"])
+
+# TODO: Add more routes as they're created
+# from app.routes import matches, ai_date_plan
 # app.include_router(matches.router, prefix="/api/matches", tags=["matches"])
 # app.include_router(ai_date_plan.router, prefix="/api/ai", tags=["ai"])
 

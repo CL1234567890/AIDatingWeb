@@ -50,26 +50,26 @@ export const getOrCreateConversation = async (currentUserId, otherUserId) => {
     const conversationId = `${sortedIds[0]}_${sortedIds[1]}`;
     const conversationRef = doc(db, 'conversations', conversationId);
     
-    // Get user details for both participants
-    const currentUserDoc = await getDoc(doc(db, 'users', currentUserId));
-    const otherUserDoc = await getDoc(doc(db, 'users', otherUserId));
+    // Get user details for both participants from profiles collection
+    const currentProfileDoc = await getDoc(doc(db, 'profiles', currentUserId));
+    const otherProfileDoc = await getDoc(doc(db, 'profiles', otherUserId));
     
-    const currentUserData = currentUserDoc.data();
-    const otherUserData = otherUserDoc.data();
+    const currentProfileData = currentProfileDoc.data();
+    const otherProfileData = otherProfileDoc.data();
     
     // Create new conversation with deterministic ID
     const newConversation = {
       participants: sortedIds,
       participantDetails: {
         [currentUserId]: {
-          name: currentUserData?.profile?.name || currentUserData?.email || 'User',
-          email: currentUserData?.email || '',
-          photoUrl: currentUserData?.profile?.photos?.[0] || null
+          name: currentProfileData?.name || 'User',
+          email: currentProfileData?.email || '',
+          photoUrl: currentProfileData?.photos?.[0] || null
         },
         [otherUserId]: {
-          name: otherUserData?.profile?.name || otherUserData?.email || 'User',
-          email: otherUserData?.email || '',
-          photoUrl: otherUserData?.profile?.photos?.[0] || null
+          name: otherProfileData?.name || 'User',
+          email: otherProfileData?.email || '',
+          photoUrl: otherProfileData?.photos?.[0] || null
         }
       },
       lastMessage: null,

@@ -24,20 +24,19 @@ const ChatConversation = () => {
   const [showIcebreakers, setShowIcebreakers] = useState(false);
   const messagesEndRef = useRef(null);
 
-  // Fetch other user's profile
+  // Fetch other user's profile from Firestore
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
-        const token = await currentUser.getIdToken();
-        const response = await fetch(`http://localhost:8000/api/user/profile/${matchId}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
+        // Import db and getDoc from firebase-config
+        const { db } = await import('../firebase-config');
+        const { doc, getDoc } = await import('firebase/firestore');
         
-        if (response.ok) {
-          const data = await response.json();
-          setOtherUserName(data.name || 'User');
+        const profileDoc = await getDoc(doc(db, 'profiles', matchId));
+        
+        if (profileDoc.exists()) {
+          const profileData = profileDoc.data();
+          setOtherUserName(profileData.name || 'User');
         } else {
           setOtherUserName('User');
         }

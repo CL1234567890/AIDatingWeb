@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { subscribeToConversations } from '../services/chatService';
+import { db } from '../firebase-config';
+import { doc, getDoc } from 'firebase/firestore';
 
 const ChatList = () => {
   const { currentUser } = useAuth();
@@ -9,14 +11,43 @@ const ChatList = () => {
   const [conversations, setConversations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [userProfiles, setUserProfiles] = useState({});
+
+  // Fetch user profile from Firestore
+  const fetchUserProfile = async (userId) => {
+    try {
+      const profileDoc = await getDoc(doc(db, 'profiles', userId));
+      if (profileDoc.exists()) {
+        return profileDoc.data();
+      }
+      return null;
+    } catch (err) {
+      console.error('Error fetching user profile:', err);
+      return null;
+    }
+  };
 
   // Subscribe to conversations on mount
   useEffect(() => {
     if (!currentUser) return;
 
     setLoading(true);
-    const unsubscribe = subscribeToConversations(currentUser.uid, (convs) => {
+    const unsubscribe = subscribeToConversations(currentUser.uid, async (convs) => {
       setConversations(convs);
+      
+      // Fetch profiles for all conversation participants
+      const profiles = {};
+      for (const conv of convs) {
+        const otherUserId = conv.participants.find(id => id !== currentUser.uid);
+        if (otherUserId && !profiles[otherUserId]) {
+          const profile = await fetchUserProfile(otherUserId);
+          if (profile) {
+            profiles[otherUserId] = profile;
+          }
+        }
+      }
+      setUserProfiles(profiles);
+      
       setLoading(false);
       setError(null);
     });
@@ -45,10 +76,22 @@ const ChatList = () => {
 
   // Get other user's info from conversation
   const getOtherUser = (conversation) => {
-    if (!conversation.participantDetails) return { name: 'User', email: '' };
-    
     const otherUserId = conversation.participants.find(id => id !== currentUser.uid);
-    return conversation.participantDetails[otherUserId] || { name: 'User', email: '' };
+    
+    // First try to get from fetched profiles
+    if (userProfiles[otherUserId]) {
+      return {
+        name: userProfiles[otherUserId].name || 'User',
+        email: userProfiles[otherUserId].email || ''
+      };
+    }
+    
+    // Fallback to stored participant details
+    if (conversation.participantDetails && conversation.participantDetails[otherUserId]) {
+      return conversation.participantDetails[otherUserId];
+    }
+    
+    return { name: 'User', email: '' };
   };
 
   // Navigate to conversation

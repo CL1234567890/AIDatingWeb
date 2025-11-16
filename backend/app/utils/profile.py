@@ -22,12 +22,14 @@ def get_user_profile(user_id):
     gender: str,
     sexual_orientation: str,
     age: int,
-    income_level: str,
+    location: str,
+    income_bracket: str,
     education_level: str,
     interest_tags: str,
     likes_received: int,
     mutual_matches: int,
     app_usage_time_label: str,
+    app_usage_time_min: int
     """
 
     profile_ref = db.collection('profile').document(user_id)

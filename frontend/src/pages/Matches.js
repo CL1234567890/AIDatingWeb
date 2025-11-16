@@ -41,7 +41,8 @@ const Matches = () => {
   };
 
   const handleMessage = (id) => {
-    navigate(`/chat/${id}`);
+    // For now using mock ID, replace with actual Firebase user ID when integrating with real matches
+    navigate(`/conversations/${id}`);
   };
 
   return (

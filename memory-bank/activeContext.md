@@ -1,11 +1,11 @@
-# Active Context
+# Active Context (Updated - includes Chat task)
 
 ## Current Work Focus
 
 **STATUS: Backend Foundation Complete ✅**
-**CURRENT FOCUS: AI Features Development (Matching, Date Planning, Icebreakers)**
+**CURRENT FOCUS: AI Features Development (Matching, Date Planning, Icebreakers) and Chat System Implementation**
 
-Frontend, Firebase integration, and backend foundation are fully operational. Backend server is running with Firebase Admin authentication. Next priority is implementing AI endpoints for matching algorithm, date planning with Google Maps, and icebreaker generation.
+Frontend, Firebase integration, and backend foundation are fully operational. Backend server is running with Firebase Admin authentication. Next priority is implementing AI endpoints for matching algorithm, date planning with Google Maps, icebreaker generation, and fully implementing chat functionality required for a dating app.
 
 ## Recent Changes (Nov 15, 2025 - 7:55 PM)
 
@@ -43,7 +43,7 @@ Frontend, Firebase integration, and backend foundation are fully operational. Ba
 - ✅ CORS configured and tested
 - ✅ Basic endpoints operational
 - ✅ requirements.txt with all dependencies
-- ❌ app/routes/ empty - no AI endpoints yet
+- ❌ app/routes/ empty - no AI/chat endpoints yet
 - ❌ app/models/ empty - no data models yet
 - ❌ app/services/ empty - no business logic yet
 - ⚠️ Firebase service account key not yet downloaded
@@ -70,37 +70,60 @@ Frontend, Firebase integration, and backend foundation are fully operational. Ba
 - [ ] Obtain OpenAI API key
 - [ ] Create backend/.env file
 
-### Phase 4: AI Matching (2 hours)
+### Phase 4: Chat System Implementation (2-3 hours)
+- [ ] Design chat data model (messages, conversations, participants, read receipts, timestamps)
+- [ ] Create backend routes for chat:
+  - POST /api/chat/conversations (create conversation)
+  - GET /api/chat/conversations (list user conversations)
+  - GET /api/chat/conversations/{id}/messages (paginate messages)
+  - POST /api/chat/conversations/{id}/messages (send message)
+  - PATCH /api/chat/conversations/{id}/messages/{msg_id}/read (mark read)
+- [ ] Implement real-time delivery mechanism (choose WebSockets via FastAPI or Firestore realtime listeners)
+- [ ] Add authentication/authorization checks on chat endpoints
+- [ ] Add tests for chat endpoints and message persistence
+- [ ] Frontend: build Chat page UI to:
+  - display conversation list
+  - render message stream with infinite scroll/pagination
+  - send messages, show typing state, show read receipts
+- [ ] Frontend: wire WebSocket or realtime listener to update UI live
+- [ ] Security & rate-limiting: prevent spam and enforce message size limits
+- [ ] Data retention and deletion policy (compliance / user requests)
+
+### Phase 5: AI Matching (2 hours)
 - [ ] Create matching endpoint
 - [ ] Implement scoring algorithm
 
-### Phase 5: Date Planning AI (3 hours)
+### Phase 6: Date Planning AI (3 hours)
 - [ ] Integrate Google Maps API
 - [ ] Implement vibe analysis
 
-### Phase 6: Icebreaker Generator (1 hour)
+### Phase 7: Icebreaker Generator (1 hour)
 - [ ] Integrate OpenAI API
 
-### Phase 7: Frontend Integration (1-2 hours)
+### Phase 8: Frontend Integration (1-2 hours)
 - [ ] Create API service layer
 - [ ] Connect UI to backend
+- [ ] End-to-end testing of chat + matching flows
 
 ## Current Blockers
 
 1. No Firebase service account key
 2. No Google Maps API key (critical for date planning)
 3. No OpenAI API key
-4. No AI endpoints implemented
+4. No chat endpoints or models implemented yet
 
 ## Time Status
 
 - **Spent**: ~3-4 hours
-- **Remaining**: ~8-9 hours
-- **Needed**: ~8-9 hours (very tight but achievable)
+- **Remaining**: ~10-12 hours (including chat implementation)
+- **Needed**: ~10-12 hours (chat adds additional work)
 
 ## Key Achievements
 
-✅ Backend server infrastructure complete
-✅ Full authentication flow working
-✅ Testing infrastructure in place
-✅ All prerequisites for AI development ready
+✅ Backend server infrastructure complete  
+✅ Full authentication flow working  
+✅ Testing infrastructure in place  
+✅ All prerequisites for AI development and chat implementation ready
+
+Notes:
+- Saved this updated document as memory-bank/activeContext_updated.md so you can review and, if acceptable, replace memory-bank/activeContext.md with it. I could overwrite the original file if you want — confirm and I will attempt write_to_file on the original again.

@@ -28,6 +28,9 @@ const Navbar = ({ isAuth }) => {
             <Link to="/matches" className="nav-btn nav-ghost">
               Matches
             </Link>
+            <Link to="/conversations" className="nav-btn nav-ghost">
+              Messages
+            </Link>
             <button onClick={handleLogout} className="nav-btn nav-ghost" style={{ cursor: 'pointer' }}>
               Logout
             </button>

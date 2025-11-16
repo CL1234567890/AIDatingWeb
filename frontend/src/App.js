@@ -14,6 +14,8 @@ import Register from "./pages/Register";
 import DatePlanner from "./pages/DatePlannar";
 import Matches from "./pages/Matches";
 import Chat from "./pages/Chat";
+import ChatList from "./pages/ChatList";
+import ChatConversation from "./pages/ChatConversation";
 import Dashboard from "./pages/Dashboard";
 import TestAuth from "./pages/TestAuth";
 
@@ -100,6 +102,24 @@ function AppContent() {
             element={
               <ProtectedRoute>
                 <Chat />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/conversations"
+            element={
+              <ProtectedRoute>
+                <ChatList />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/conversations/:matchId"
+            element={
+              <ProtectedRoute>
+                <ChatConversation />
               </ProtectedRoute>
             }
           />

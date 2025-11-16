@@ -18,6 +18,7 @@ import ChatList from "./pages/ChatList";
 import ChatConversation from "./pages/ChatConversation";
 import Dashboard from "./pages/Dashboard";
 import TestAuth from "./pages/TestAuth";
+import TestUsers from "./pages/TestUsers";
 
 const ProtectedRoute = ({ children }) => {
   const { currentUser } = useAuth();
@@ -129,6 +130,15 @@ function AppContent() {
             element={
               <ProtectedRoute>
                 <TestAuth />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/test-users"
+            element={
+              <ProtectedRoute>
+                <TestUsers />
               </ProtectedRoute>
             }
           />

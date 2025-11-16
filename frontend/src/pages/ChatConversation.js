@@ -48,14 +48,22 @@ const ChatConversation = () => {
 
     const unsubscribe = subscribeToMessages(conversationId, (newMessages) => {
       setMessages(newMessages);
-      // Mark messages as read when they arrive
-      if (newMessages.length > 0) {
-        markMessagesAsRead(conversationId, currentUser.uid).catch(console.error);
-      }
     });
 
     return () => unsubscribe();
   }, [conversationId, currentUser.uid]);
+
+  // Mark messages as read when conversation opens or new messages arrive
+  useEffect(() => {
+    if (!conversationId || messages.length === 0) return;
+
+    // Debounce the mark as read to avoid too many calls
+    const timer = setTimeout(() => {
+      markMessagesAsRead(conversationId, currentUser.uid).catch(console.error);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [conversationId, messages.length, currentUser.uid]);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {

@@ -81,6 +81,20 @@ const Dashboard = () => {
         >
           View messages
         </Link>
+
+        <Link
+          to="/test-users"
+          className="nav-btn nav-ghost"
+          style={{
+            textAlign: "center",
+            textDecoration: "none",
+            width: "100%",
+            background: "rgba(59, 130, 246, 0.1)",
+            borderColor: "rgba(59, 130, 246, 0.3)",
+          }}
+        >
+          🧪 Test Chat (All Users)
+        </Link>
       </div>
     </div>
   );
